@@ -29,3 +29,10 @@ export function updSpu(data) {
     data
   })
 }
+export function getById(data) {
+  return request({
+    url: url + '/Spu/GetListByCatalog2Id',
+    method: 'get',
+    params: data
+  })
+}

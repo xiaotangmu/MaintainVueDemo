@@ -73,6 +73,12 @@ const routes = [{
       meta: { title: '标准产品管理', icon: '' }
     },
     {
+      path: 'sku',
+      component: 'system_sku',
+      name: 'Sku',
+      meta: { title: '库存管理', icon: '' }
+    },
+    {
       path: 'warehouseOut',
       component: 'system_warehouseOut',
       name: 'warehouseOut',

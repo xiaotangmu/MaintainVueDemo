@@ -59,26 +59,6 @@
       center
     >
       <el-form>
-        <el-form-item label="所属一级目录">
-          <el-select v-model="attr.Catalog1Id" placeholder="请选择" style="width: 100%;">
-            <el-option
-              v-for="item in options"
-              :key="item.Id"
-              :label="item.CatalogName"
-              :value="item.Id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="所属二级级目录">
-          <el-select v-model="attr.Catalog2Id" placeholder="请选择" style="width: 100%;">
-            <el-option
-              v-for="item in attrCatalogList"
-              :key="item.Id"
-              :label="item.CatalogName"
-              :value="item.Id"
-            />
-          </el-select>
-        </el-form-item>
         <el-form-item label="属性名称">
           <el-select v-model="attr.AttrId" placeholder="请选择" style="width: 100%;">
             <el-option
@@ -136,8 +116,6 @@ export default {
         SpuAttrModelList: []
       },
       attr: {
-        Catalog1Id: '',
-        Catalog2Id: '',
         AttrId: ''
       },
       loading: false,
@@ -159,20 +137,15 @@ export default {
   },
   watch: {
     catalog1Id(val) {
-      getListBy1({ Catalog1Id: val }).then(res => {
-        this.catalogList = res.data
-      })
-    },
-    'attr.Catalog1Id'(val) {
-      this.attr.Catalog2Id = ''
+      this.spu.Catalog2Id = ''
       if (!val) {
         return
       }
       getListBy1({ Catalog1Id: val }).then(res => {
-        this.attrCatalogList = res.data
+        this.catalogList = res.data
       })
     },
-    'attr.Catalog2Id'(val) {
+    'spu.Catalog2Id'(val, old) {
       this.attr.AttrId = ''
       if (!val) {
         return
