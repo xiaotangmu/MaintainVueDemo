@@ -9,5 +9,6 @@ export const cpn = {
   system_product: () => import('@/views/system/product'),
   system_sku: () => import('@/views/system/sku'),
   system_entry: () => import('@/views/system/entry'),
-  system_out: () => import('@/views/system/out')
+  system_out: () => import('@/views/system/out'),
+  system_appointment: () => import('@/views/system/appointment')
 }

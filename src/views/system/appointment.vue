@@ -15,36 +15,7 @@
 
       <el-table-column type="expand">
         <template slot-scope="props">
-          <h4 style="margin: 0;">位置信息</h4>
-          <el-table
-            :data="props.row.addressList"
-            style="width: 100%"
-          >
-            <el-table-column
-              prop="Room"
-              label="房间"
-            />
-            <el-table-column
-              prop="Self"
-              label="货架"
-            />
-            <el-table-column
-              prop="Quantity"
-              label="数量"
-            />
-            <el-table-column
-              label="参考价格"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price | toMoney }}
-              </template>
-            </el-table-column>
-            <el-table-column label="新旧">
-              <template slot-scope="scope">
-                {{ scope.row.Status === 0 ? "新" : "旧" }}
-              </template>
-            </el-table-column>
-          </el-table>
+          备注: {{ props.row.Remark }}
         </template>
       </el-table-column>
 
@@ -56,21 +27,7 @@
           :prop="col.model"
         >
           <template slot-scope="scope">
-            <template v-if="col.model === 'SpuAttrModelList'">
-              <div v-for="i in scope.row.SpuAttrModelList" :key="i.Id" type="primary">
-                {{ i.AttrName }}:
-                <el-tag v-for="j in i.ValueList" :key="j.Id" type="primary">
-                  {{ j.Value }}
-                </el-tag>
-              </div>
-            </template>
-            <template v-else-if="col.model === 'Tool'">
-              {{ scope.row[col.model] === 0 ? "配件" : "工具" }}
-            </template>
-            <template v-else-if="col.model === 'Price'">
-              {{ scope.row[col.model] | toMoney }}
-            </template>
-            <template v-else>
+            <template>
               {{ scope.row[col.model] }}
             </template>
           </template>
@@ -88,28 +45,29 @@
       @size-change="handleSizeChange"
       @current-change="getList"
     />
-    <spu-modal ref="spuModal" @handleSuccess="getList" />
+    <edit-modal ref="editModal" @handleSuccess="getList" />
   </div>
 </template>
 
 <script>
-import { getSkuList, delSku } from '@/api/system/sku'
+import { getAppointmentList, delAppointment } from '@/api/system/appointment'
 import { delEmpty } from '@/utils/utils'
-import SpuModal from './components/SkuModal'
+import EditModal from './components/AppointmentModal'
 export default {
   components: {
-    SpuModal
+    EditModal
   },
   data() {
     return {
       column: [
-        { label: '库存名称', model: 'SkuName' },
-        { label: '库存描述', model: 'Description' },
-        { label: '警报值', model: 'Alarm' },
-        { label: '品牌', model: 'Brand' },
-        { label: '金额', model: 'Price' },
-        { label: '数量', model: 'TotalCount' },
-        { label: '配件/工具', model: 'Tool' }
+        { label: '所属公司', model: 'CompanyId' },
+        { label: '车牌号码', model: 'CarLicense' },
+        { label: '问题描述', model: 'Description' },
+        { label: '预约时间', model: 'AppointmentDate' },
+        { label: '车型', model: 'Type' },
+        { label: '联系人', model: 'Contact' },
+        { label: '联系电话', model: 'Phone' },
+        { label: '状态', model: 'Status' }
       ],
       size: 10,
       currentPage: 1,
@@ -126,21 +84,21 @@ export default {
       this.getList()
     },
     getList() {
-      getSkuList(delEmpty({ PageIndex: this.currentPage, PageSize: this.size })).then(res => {
+      getAppointmentList(delEmpty({ PageIndex: this.currentPage, PageSize: this.size, Status: -1 })).then(res => {
         this.tableData = res.data.Items
         this.total = res.data.TotalCount
       })
     },
     handleNew() {
-      this.$refs.spuModal.add()
+      this.$refs.editModal.add()
     },
     handleEdit(index, row) {
-      this.$refs.spuModal.edit(row)
+      this.$refs.editModal.edit(row)
     },
     handleDelete(index, row) {
-      this.$confirm('确认删除?(' + row.ProductName + ')')
+      this.$confirm('确认删除?')
         .then(() => {
-          delSku({ Id: row.Id, ProductName: row.ProductName }).then(() => {
+          delAppointment({ AppointmentNo: row.AppointmentNo }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

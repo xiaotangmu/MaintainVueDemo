@@ -1,37 +1,37 @@
 import request from '@/utils/request'
 import { url } from '../proxy'
 
-export function getEntryList(params) {
+export function getOutList(params) {
   return request({
-    url: url + '/Entry/GetListPageBySearch',
+    url: url + '/Out/GetListPageBySearch',
     method: 'get',
     params
   })
 }
-export function addEntry(data) {
+export function addOut(data) {
   return request({
-    url: url + '/Entry/Add',
+    url: url + '/Out/Add',
     method: 'post',
     data
   })
 }
-export function delEntry(data) {
+export function delOut(data) {
   return request({
-    url: url + '/Entry/Delete',
+    url: url + '/Out/Delete',
     method: 'delete',
     params: data
   })
 }
-export function updEntry(data) {
+export function updOut(data) {
   return request({
-    url: url + '/Entry/Update',
+    url: url + '/Out/Update',
     method: 'post',
     data
   })
 }
-export function remarkEntry(data) {
+export function remarkOut(data) {
   return request({
-    url: url + '/Entry/RemarkEntry',
+    url: url + '/Out/RemarkOut',
     method: 'post',
     data
   })

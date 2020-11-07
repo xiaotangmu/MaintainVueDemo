@@ -10,7 +10,7 @@
       :load="load"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column align="center" prop="CatalogName" label="菜单名称" />
+      <el-table-column align="left" prop="CatalogName" label="菜单名称" />
       <el-table-column
         align="center"
         label="操作"

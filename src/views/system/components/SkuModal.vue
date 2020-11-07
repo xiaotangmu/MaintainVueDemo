@@ -3,11 +3,11 @@
     :title="type"
     :visible.sync="dialogVisible"
     :modal-append-to-body="false"
-    width="50%"
+    width="70%"
   >
     <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="80px">
-      <el-form-item label="库存名称" prop="SkuName">
-        <el-input v-model="modal.SkuName" />
+      <el-form-item label="库存名">
+        <el-input v-model="modal.SkuName" disabled />
       </el-form-item>
       <el-form-item v-show="!disable" label="所属一级目录">
         <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
@@ -34,8 +34,8 @@
           <el-option
             v-for="item in spuList"
             :key="item.Id"
-            :label="item.AttrName"
-            :value="item.Id + '***' + item.AttrName"
+            :label="item.ProductName"
+            :value="item.Id"
           />
         </el-select>
       </el-form-item>
@@ -49,18 +49,12 @@
         <el-input v-model="modal.Brand" />
       </el-form-item>
       <el-form-item label="单价">
-        <el-input v-model="modal.Price" />
+        <el-input-number v-model="modal.Price" :precision="2" :step="1" />
       </el-form-item>
       <el-form-item label="配件/工具">
         <el-select v-model="modal.Tool">
           <el-option :value="0" label="配件" />
           <el-option :value="1" label="工具" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="新旧">
-        <el-select v-model="modal.Status">
-          <el-option :value="0" label="新" />
-          <el-option :value="1" label="旧" />
         </el-select>
       </el-form-item>
       <el-card class="box-card">
@@ -85,17 +79,27 @@
           <el-table-column
             prop="Room"
             label="房间"
-            width="180"
           />
           <el-table-column
             prop="Self"
             label="货架"
-            width="180"
           />
           <el-table-column
             prop="Quantity"
             label="数量"
           />
+          <el-table-column
+            label="参考价格"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.Price | toMoney }}
+            </template>
+          </el-table-column>
+          <el-table-column label="新旧">
+            <template slot-scope="scope">
+              {{ scope.row.Status === 0 ? "新" : "旧" }}
+            </template>
+          </el-table-column>
         </el-table>
       </el-card>
     </el-form>
@@ -110,15 +114,24 @@
       width="30%"
       center
     >
-      <el-form>
+      <el-form label-width="80px">
         <el-form-item label="房间">
-          <el-input v-model="value.Room" style="width: 100%;" />
+          <el-input v-model="value.Room" style="width: 300px;" />
         </el-form-item>
         <el-form-item label="货架">
-          <el-input v-model="value.Self" style="width: 100%;" />
+          <el-input v-model="value.Self" style="width: 300px;" />
         </el-form-item>
         <el-form-item label="数量">
-          <el-input v-model="value.Quantity" style="width: 100%;" />
+          <el-input-number v-model="value.Quantity" :step="1" />
+        </el-form-item>
+        <el-form-item label="参考价格">
+          <el-input-number v-model="value.Price" :precision="2" :step="1" />
+        </el-form-item>
+        <el-form-item label="新旧">
+          <el-select v-model="value.Status" style="width: 300px;">
+            <el-option :value="0" label="新" />
+            <el-option :value="1" label="旧" />
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -140,27 +153,27 @@ export default {
       value: {
         Room: '',
         Self: '',
-        Quantity: ''
+        Quantity: '',
+        Price: '',
+        Status: null
       },
       valueVisible: false,
       dialogVisible: false,
       type: '',
       modal: {
-        SkuName: '',
+        SpuId: '',
         Catalog2Id: '',
         Description: '',
         Alarm: '',
         Brand: '',
         Price: '',
         Tool: '',
-        Status: '',
         addressList: []
       },
       loading: false,
       options: [],
       catalog1Id: '',
       rule: {
-        SkuName: [{ required: true, message: '请输入库存名称', trigger: 'blur' }],
         Catalog2Id: [{ required: true, message: '请请选择目录', trigger: 'blur' }]
       },
       catalogList: [],
@@ -175,7 +188,17 @@ export default {
     }
   },
   watch: {
+    'modal.SpuId'(val) {
+      this.spuList.forEach(i => {
+        if (val === i.Id) {
+          this.modal.SkuName = i.ProductName
+        }
+      })
+    },
     catalog1Id(val) {
+      if (this.type === '编辑') {
+        return
+      }
       this.modal.Catalog2Id = ''
       if (!val) {
         return
@@ -185,6 +208,9 @@ export default {
       })
     },
     'modal.Catalog2Id'(val) {
+      if (this.type === '编辑') {
+        return
+      }
       this.modal.SpuId = ''
       if (!val) {
         return
@@ -220,7 +246,9 @@ export default {
       this.value = {
         Room: '',
         Self: '',
-        Quantity: ''
+        Quantity: '',
+        Price: '',
+        Status: null
       }
     },
     handleDelete(index) {
@@ -254,14 +282,13 @@ export default {
       this.type = '新增'
       this.dialogVisible = true
       this.modal = {
-        SkuName: '',
+        SpuId: '',
         Catalog2Id: '',
         Description: '',
         Alarm: '',
         Brand: '',
         Price: '',
         Tool: '',
-        Status: '',
         addressList: []
       }
     },

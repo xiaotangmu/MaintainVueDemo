@@ -1,0 +1,125 @@
+<template>
+  <el-dialog
+    :title="type"
+    :visible.sync="dialogVisible"
+    :modal-append-to-body="false"
+    width="40%"
+  >
+    <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="80px">
+      <el-form-item label="所属公司" prop="CompanyId">
+        <el-input v-model="modal.CompanyId" />
+      </el-form-item>
+      <el-form-item label="车牌号码">
+        <el-input v-model="modal.CarLicense" />
+      </el-form-item>
+      <el-form-item label="问题描述">
+        <el-input v-model="modal.Description" />
+      </el-form-item>
+      <el-form-item label="预约时间">
+        <el-date-picker
+          v-model="modal.AppointmentDate"
+          type="datetime"
+          placeholder="选择日期时间"
+          style="width: 100%;"
+        />
+      </el-form-item>
+      <el-form-item label="车型">
+        <el-input v-model="modal.Type" />
+      </el-form-item>
+      <el-form-item label="联系人">
+        <el-input v-model="modal.Contact" />
+      </el-form-item>
+      <el-form-item label="联系电话">
+        <el-input v-model="modal.Phone" />
+      </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="modal.Status" style="width: 100%;">
+          <el-option :value="0" label="未处理" />
+          <el-option :value="1" label="已处理" />
+          <el-option :value="2" label="取消" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="备注">
+        <el-input v-model="modal.Remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" />
+      </el-form-item>
+    </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">确 定</el-button>
+    </span>
+  </el-dialog>
+</template>
+
+<script>
+import { addAppointment, updAppointment } from '@/api/system/appointment'
+export default {
+  data() {
+    return {
+      dialogVisible: false,
+      type: '',
+      modal: {
+        CompanyId: '',
+        CarLicense: '',
+        Description: '',
+        AppointmentDate: '',
+        Type: '',
+        Contact: '',
+        Phone: '',
+        Status: ''
+      },
+      loading: false,
+      rule: {
+        CompanyId: [{ required: true, message: '请选择公司', trigger: 'blur' }]
+      }
+    }
+  },
+  computed: {
+    disable() {
+      return this.type === '编辑'
+    }
+  },
+  watch: {},
+  methods: {
+    submit() {
+      this.loading = true
+      if (this.type === '新增') {
+        addAppointment(this.modal).then(() => {
+          this.$emit('handleSuccess')
+          this.loading = false
+          this.dialogVisible = false
+        }).catch(() => {
+          this.loading = false
+        })
+      } else {
+        updAppointment(this.modal).then(() => {
+          this.$emit('handleSuccess')
+          this.loading = false
+          this.dialogVisible = false
+        }).catch(() => {
+          this.loading = false
+        })
+      }
+    },
+    add() {
+      this.type = '新增'
+      this.dialogVisible = true
+      this.modal = {
+        SpuId: '',
+        Catalog2Id: '',
+        Description: '',
+        Alarm: '',
+        Brand: '',
+        Price: '',
+        Tool: '',
+        addressList: []
+      }
+    },
+    edit(row) {
+      this.type = '编辑'
+      this.dialogVisible = true
+      this.modal = row
+    }
+  }
+}
+
+</script>

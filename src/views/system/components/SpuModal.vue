@@ -123,7 +123,7 @@ export default {
       catalog1Id: '',
       rule: {
         ProductName: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
-        Catalog2Id: [{ required: true, message: '请请选择目录', trigger: 'blur' }]
+        Catalog2Id: [{ required: true, message: '请选择目录', trigger: 'blur' }]
       },
       catalogList: [],
       attrCatalogList: [],
