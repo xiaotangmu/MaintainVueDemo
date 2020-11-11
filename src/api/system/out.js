@@ -8,6 +8,13 @@ export function getOutList(params) {
     params
   })
 }
+export function getOutAll(params) {
+  return request({
+    url: url + '/Out/GetAll',
+    method: 'get',
+    params
+  })
+}
 export function addOut(data) {
   return request({
     url: url + '/Out/Add',

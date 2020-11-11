@@ -17,9 +17,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="目录名称">
-        <el-input v-model="catalog.CatalogName" />
-      </el-form-item>
       <el-form-item v-if="nested === 2" label="所属一级目录">
         <el-select v-model="catalog.Catalog1Id" :disabled="disable" placeholder="请选择" style="width: 100%;">
           <el-option
@@ -29,6 +26,9 @@
             :value="item.Id"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="目录名称">
+        <el-input v-model="catalog.CatalogName" />
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -115,12 +115,13 @@ export default {
       this.catalog.Catalog1Id = ''
     },
     edit(row) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
-      this.nested = row.Catalog1Id ? 2 : 1
+      this.nested = obj.Catalog1Id ? 2 : 1
       this.dialogVisible = true
-      this.catalog.Id = row.Id
-      this.catalog.CatalogName = row.CatalogName
-      this.catalog.Catalog1Id = row.Catalog1Id || 'ROOT'
+      this.catalog.Id = obj.Id
+      this.catalog.CatalogName = obj.CatalogName
+      this.catalog.Catalog1Id = obj.Catalog1Id || 'ROOT'
     }
   }
 }

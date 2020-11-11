@@ -107,12 +107,13 @@ export default {
       this.attr.CatalogId = ''
     },
     edit(row, index) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
       this.index = index
-      this.attr.Id = row.Id
-      this.attr.AttrName = row.AttrName
-      this.attr.CatalogId = row.CatalogId
+      this.attr.Id = obj.Id
+      this.attr.AttrName = obj.AttrName
+      this.attr.CatalogId = obj.CatalogId
     }
   }
 }

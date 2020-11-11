@@ -198,6 +198,7 @@ export default {
       this.loading = true
       if (this.type === '新增') {
         addSpu(this.spu).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -206,6 +207,7 @@ export default {
         })
       } else {
         updSpu(this.spu).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -225,9 +227,16 @@ export default {
       }
     },
     edit(row) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
-      this.spu = row
+      this.spu = obj
+    },
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
+      })
     }
   }
 }

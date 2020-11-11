@@ -138,9 +138,9 @@ export default {
       this.$refs.spuModal.edit(row)
     },
     handleDelete(index, row) {
-      this.$confirm('确认删除?(' + row.ProductName + ')')
+      this.$confirm('确认删除?(' + row.SkuName + ')')
         .then(() => {
-          delSku({ Id: row.Id, ProductName: row.ProductName }).then(() => {
+          delSku({ SkuId: row.Id, SkuName: row.SkuName }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

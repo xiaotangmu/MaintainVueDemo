@@ -5,59 +5,81 @@
     :modal-append-to-body="false"
     width="70%"
   >
-    <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="80px">
-      <el-form-item label="库存名">
+    <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="120px">
+      <!-- <el-form-item label="库存名">
         <el-input v-model="modal.SkuName" disabled />
-      </el-form-item>
-      <el-form-item v-show="!disable" label="所属一级目录">
-        <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
-          <el-option
-            v-for="item in options"
-            :key="item.Id"
-            :label="item.CatalogName"
-            :value="item.Id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item v-show="!disable" label="所属二级级目录" prop="Catalog2Id">
-        <el-select v-model="modal.Catalog2Id" placeholder="请选择" style="width: 100%;">
-          <el-option
-            v-for="item in catalogList"
-            :key="item.Id"
-            :label="item.CatalogName"
-            :value="item.Id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item v-show="!disable" label="标准产品">
-        <el-select v-model="modal.SpuId" placeholder="请选择" style="width: 100%;">
-          <el-option
-            v-for="item in spuList"
-            :key="item.Id"
-            :label="item.ProductName"
-            :value="item.Id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="库存描述">
-        <el-input v-model="modal.Description" />
-      </el-form-item>
-      <el-form-item label="警报值">
-        <el-input v-model="modal.Alarm" />
-      </el-form-item>
-      <el-form-item label="品牌">
-        <el-input v-model="modal.Brand" />
-      </el-form-item>
-      <el-form-item label="单价">
-        <el-input-number v-model="modal.Price" :precision="2" :step="1" />
-      </el-form-item>
-      <el-form-item label="配件/工具">
-        <el-select v-model="modal.Tool">
-          <el-option :value="0" label="配件" />
-          <el-option :value="1" label="工具" />
-        </el-select>
-      </el-form-item>
-      <el-card class="box-card">
+      </el-form-item> -->
+      <el-col :span="12">
+        <el-form-item v-show="!disable" label="所属一级目录">
+          <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
+            <el-option
+              v-for="item in options"
+              :key="item.Id"
+              :label="item.CatalogName"
+              :value="item.Id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item v-show="!disable" label="所属二级级目录" prop="Catalog2Id">
+          <el-select v-model="modal.Catalog2Id" placeholder="请选择" style="width: 100%;">
+            <el-option
+              v-for="item in catalogList"
+              :key="item.Id"
+              :label="item.CatalogName"
+              :value="item.Id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item v-show="!disable" label="标准产品">
+          <el-select v-model="modal.SpuId" placeholder="请选择" style="width: 100%;">
+            <el-option
+              v-for="item in spuList"
+              :key="item.Id"
+              :label="item.ProductName"
+              :value="item.Id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="库存描述">
+          <el-input v-model="modal.Description" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="警报值">
+          <el-input v-model="modal.Alarm" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="品牌">
+          <el-input v-model="modal.Brand" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="单价">
+          <el-input-number v-model="modal.Price" :precision="2" :step="1" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="配件/工具">
+          <el-select v-model="modal.Tool">
+            <el-option :value="0" label="配件" />
+            <el-option :value="1" label="工具" />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="总数">
+          <el-input-number v-model="modal.TotalCount" disabled :step="1" />
+        </el-form-item>
+      </el-col>
+
+      <el-card class="box-card" style="width: 100%;">
         <div slot="header" class="clearfix">
           <span>位置列表</span>
           <el-button style="float: right; padding: 3px 0" type="text" @click="newAddr">新增</el-button>
@@ -111,7 +133,7 @@
       :title="valueTitle"
       :visible.sync="valueVisible"
       :append-to-body="true"
-      width="30%"
+      width="33%"
       center
     >
       <el-form label-width="80px">
@@ -168,6 +190,7 @@ export default {
         Brand: '',
         Price: '',
         Tool: '',
+        TotalCount: 20,
         addressList: []
       },
       loading: false,
@@ -185,9 +208,17 @@ export default {
   computed: {
     disable() {
       return this.type === '编辑'
+    },
+    totalCount() {
+      return this.modal.addressList.reduce((total, item) => {
+        return total + item.Quantity
+      }, 0)
     }
   },
   watch: {
+    totalCount(val) {
+      this.modal.TotalCount = val
+    },
     'modal.SpuId'(val) {
       this.spuList.forEach(i => {
         if (val === i.Id) {
@@ -262,6 +293,7 @@ export default {
       this.loading = true
       if (this.type === '新增') {
         addSku(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -270,6 +302,7 @@ export default {
         })
       } else {
         updSku(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -293,9 +326,16 @@ export default {
       }
     },
     edit(row) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
-      this.modal = row
+      this.modal = obj
+    },
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
+      })
     }
   }
 }

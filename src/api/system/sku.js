@@ -8,6 +8,13 @@ export function getSkuList(params) {
     params
   })
 }
+export function getAddrList(params) {
+  return request({
+    url: url + '/Sku/GetSkuAddressListBySkuId',
+    method: 'get',
+    params
+  })
+}
 export function addSku(data) {
   return request({
     url: url + '/Sku/Add',

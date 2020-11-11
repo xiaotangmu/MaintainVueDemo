@@ -79,10 +79,28 @@ const routes = [{
       meta: { title: '库存管理', icon: '' }
     },
     {
-      path: 'warehouseOut',
-      component: 'system_warehouseOut',
-      name: 'warehouseOut',
+      path: 'entry',
+      component: 'system_entry',
+      name: 'Entry',
+      meta: { title: '入库管理', icon: '' }
+    },
+    {
+      path: 'out',
+      component: 'system_out',
+      name: 'Out',
       meta: { title: '出库管理', icon: '' }
+    },
+    {
+      path: 'appointment',
+      component: 'system_appointment',
+      name: 'Appointment',
+      meta: { title: '维修预约', icon: '' }
+    },
+    {
+      path: 'maintain',
+      component: 'system_maintain',
+      name: 'Maintain',
+      meta: { title: '维修单', icon: '' }
     }
   ]
 }]

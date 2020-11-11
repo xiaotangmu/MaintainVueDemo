@@ -6,36 +6,53 @@
     width="60%"
   >
     <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="100px">
-      <el-form-item v-show="!disable" label="单号">
-        <el-input v-model="modal.OutNo" disabled />
-      </el-form-item>
-      <el-form-item label="操作员">
-        <el-input v-model="modal.Operator" />
-      </el-form-item>
-      <el-form-item label="总金额">
-        <el-input-number v-model="modal.TotalPrice" disabled :precision="2" :step="1" />
-      </el-form-item>
-      <el-form-item label="批次">
-        <el-input-number v-model="modal.Batch" :step="1" />
-      </el-form-item>
-      <el-form-item label="客户编号">
-        <el-input v-model="modal.ClientId" />
-      </el-form-item>
-      <el-form-item label="客户">
-        <el-input v-model="modal.ClientName" />
-      </el-form-item>
-      <el-form-item label="备注">
-        <el-input v-model="modal.Description" />
-      </el-form-item>
-      <el-form-item label="出库时间">
-        <el-date-picker
-          v-model="modal.OutDate"
-          type="datetime"
-          placeholder="选择日期时间"
-          style="width: 100%;"
-          :picker-options="pickerOptions"
-        />
-      </el-form-item>
+      <el-col :span="12">
+        <el-form-item v-show="disable" label="单号">
+          <el-input v-model="modal.OutNo" disabled />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="操作员">
+          <el-input v-model="modal.Operator" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="批次">
+          <el-input-number v-model="modal.Batch" :step="1" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="客户编号">
+          <el-input v-model="modal.ClientId" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="客户">
+          <el-input v-model="modal.ClientName" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="出库时间">
+          <el-date-picker
+            v-model="modal.OutDate"
+            type="datetime"
+            placeholder="选择日期时间"
+            style="width: 100%;"
+            :picker-options="pickerOptions"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="总金额">
+          <el-input-number v-model="modal.TotalPrice" disabled :precision="2" :step="1" />
+        </el-form-item>
+      </el-col>
+      <el-col :span="24">
+        <el-form-item label="备注">
+          <el-input v-model="modal.Description" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" />
+        </el-form-item>
+      </el-col>
+
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>库存信息</span>
@@ -47,7 +64,6 @@
         >
           <el-table-column align="left" width="180px" label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 type="danger"
                 size="mini"
@@ -55,6 +71,10 @@
               >删除</el-button>
             </template>
           </el-table-column>
+          <el-table-column
+            prop="SkuName"
+            label="库存名"
+          />
           <el-table-column
             prop="Quantity"
             label="数量"
@@ -103,7 +123,7 @@
     >
       <el-form label-width="80px" style="padding: 20px;">
         <el-form-item v-show="!itemDisable" label="所属一级目录">
-          <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
+          <el-select v-model="catalog1Id" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in options"
               :key="item.Id"
@@ -113,7 +133,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-show="!itemDisable" label="所属二级级目录" prop="Catalog2Id">
-          <el-select v-model="Catalog2Id" placeholder="请选择" style="width: 100%;">
+          <el-select v-model="Catalog2Id" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in catalogList"
               :key="item.Id"
@@ -123,7 +143,7 @@
           </el-select>
         </el-form-item>
         <el-form-item v-show="!itemDisable" label="库存">
-          <el-select v-model="value.SkuId" placeholder="请选择" style="width: 100%;">
+          <el-select v-model="value.SkuId" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in spuList"
               :key="item.Id"
@@ -132,26 +152,33 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="位置">
+          <el-select v-model="value.AddressId" :disabled="itemDisable" placeholder="请选择" style="width: 300px;">
+            <el-option
+              v-for="item in addrList"
+              :key="item.Id"
+              :label="'房间'+item.Room+ '  货架'+ item.Self"
+              :value="item.Id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="数量">
-          <el-input-number v-model="value.Quantity" style="width: 300px;" :step="1" />
+          <el-input-number v-model="value.Quantity" style="width: 300px;" :step="1" :max="maxCount" />
         </el-form-item>
         <el-form-item label="单价">
           <el-input-number v-model="value.Price" :precision="2" style="width: 300px;" :step="1" />
-        </el-form-item>
-        <el-form-item label="位置">
-          <el-input v-model="value.AddressId" style="width: 300px;" />
         </el-form-item>
         <el-form-item label="总金额">
           <el-input-number v-model="value.TotalPrice" disabled :precision="2" style="width: 300px;" :step="1" />
         </el-form-item>
         <el-form-item label="新旧">
-          <el-select v-model="value.Status" style="width: 300px;">
+          <el-select v-model="value.Status" disabled style="width: 300px;">
             <el-option :value="0" label="新" />
             <el-option :value="1" label="旧" />
           </el-select>
         </el-form-item>
         <el-form-item label="配件/工具">
-          <el-select v-model="value.Tool" style="width: 300px;">
+          <el-select v-model="value.Tool" disabled style="width: 300px;">
             <el-option :value="0" label="配件" />
             <el-option :value="1" label="工具" />
           </el-select>
@@ -177,8 +204,10 @@ export default {
           return time.getTime() > Date.now()
         }
       },
+      maxCount: 0,
       attrIndex: '',
       value: {
+        SkuName: '',
         SkuId: '',
         Quantity: '',
         Price: '',
@@ -211,7 +240,8 @@ export default {
       catalogList: [],
       spuList: [],
       valueTitle: '',
-      addrIndex: ''
+      addrIndex: '',
+      addrList: []
     }
   },
   computed: {
@@ -219,7 +249,7 @@ export default {
       return this.type === '编辑'
     },
     itemDisable() {
-      return this.valueTitle === '修改入库信息'
+      return (this.valueTitle === '修改出库信息')
     },
     entryTotal() {
       return this.modal.outSkuList.reduce((total, i) => {
@@ -254,6 +284,41 @@ export default {
       getSkuList({ Catalog2Id: val, PageIndex: 1, PageSize: 100 }).then(res => {
         this.spuList = res.data.Items
       })
+    },
+    'value.SkuId'(val) {
+      this.value.AddressId = ''
+      if (val === '') {
+        return
+      }
+      const index = this.spuList.findIndex(i => {
+        return i.Id === val
+      })
+      if (index < 0) {
+        this.addrList = []
+        this.value.Tool = ''
+        this.value.SkuName = ''
+        return
+      }
+      this.addrList = this.spuList[index].addressList
+      this.value.Tool = this.spuList[index].Tool
+      this.value.SkuName = this.spuList[index].SkuName
+    },
+    'value.AddressId'(val) {
+      this.maxCount = 0
+      this.value.Price = 0
+      this.value.Status = ''
+      if (val === '') {
+        return
+      }
+      const index = this.addrList.findIndex(i => {
+        return i.Id === val
+      })
+      if (index < 0) {
+        return
+      }
+      this.maxCount = this.addrList[index].Quantity
+      this.value.Price = this.addrList[index].Price
+      this.value.Status = this.addrList[index].Status
     }
   },
   created() {
@@ -262,14 +327,8 @@ export default {
     })
   },
   methods: {
-    handleEdit(index, row) {
-      this.addrIndex = index
-      this.value = row
-      this.valueVisible = true
-      this.valueTitle = '修改入库信息'
-    },
     addItem() {
-      if (this.valueTitle === '添加入库信息') {
+      if (this.valueTitle === '添加出库信息') {
         this.modal.outSkuList.push(this.value)
       } else {
         this.modal.outSkuList.splice(this.addrIndex, 1, this.value)
@@ -278,8 +337,9 @@ export default {
     },
     newItem() {
       this.valueVisible = true
-      this.valueTitle = '添加入库信息'
+      this.valueTitle = '添加出库信息'
       this.value = {
+        SkuName: '',
         SkuId: '',
         Quantity: '',
         Price: '',
@@ -300,6 +360,7 @@ export default {
       this.loading = true
       if (this.type === '新增') {
         addOut(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -308,6 +369,7 @@ export default {
         })
       } else {
         updOut(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -332,19 +394,27 @@ export default {
       }
     },
     edit(row) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
-      this.modal = row
+      this.modal = obj
       this.modal.outSkuList = this.modal.skuList.map(i => {
         return {
+          SkuName: i.SkuName,
           SkuId: i.SkuId,
           Quantity: i.TotalCount,
           Price: i.Price,
           AddressId: i.AddressId,
           TotalPrice: i.TotalCount * i.Price,
           Tool: i.Tool,
-          Status: null
+          Status: 0
         }
+      })
+    },
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
       })
     }
   }

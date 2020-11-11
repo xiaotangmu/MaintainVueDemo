@@ -8,6 +8,13 @@ export function getAppointmentList(params) {
     params
   })
 }
+export function getAppointmentAll(params) {
+  return request({
+    url: url + '/Appointment/GetAll',
+    method: 'get',
+    params
+  })
+}
 export function addAppointment(data) {
   return request({
     url: url + '/Appointment/Add',

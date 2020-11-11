@@ -98,7 +98,7 @@ export default {
     handleDelete(index, row) {
       this.$confirm('确认删除?')
         .then(() => {
-          delAppointment({ AppointmentNo: row.AppointmentNo }).then(() => {
+          delAppointment({ Id: row.Id, AppointmentNo: row.AppointmentNo }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

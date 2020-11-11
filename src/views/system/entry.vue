@@ -15,7 +15,7 @@
 
       <el-table-column type="expand">
         <template slot-scope="props">
-          <h4 style="margin: 0;">库存信息</h4>
+          <h4 style="margin: 0;">入库信息</h4>
           <el-table
             :data="props.row.skuList"
             style="width: 100%"
@@ -60,6 +60,29 @@
             <template v-if="col.model === 'TotalPrice'">
               {{ scope.row.TotalPrice | toMoney }}
             </template>
+            <template v-else-if="col.model === 'IsMaintain'">
+              <div v-if="scope.row.IsMaintain === 0">
+                <el-popover trigger="hover" placement="top">
+                  <p>供应商编号: {{ scope.row.SupplierId }}</p>
+                  <p>供应商: {{ scope.row.SupplierName }}</p>
+                  <div slot="reference" class="name-wrapper">
+                    <el-tag>供应商</el-tag>
+                  </div>
+                </el-popover>
+              </div>
+              <div v-else>
+                <el-popover trigger="hover" placement="top">
+                  <p>公司名: {{ scope.row.maintainShowModel.CompanyName }}</p>
+                  <p>车牌号: {{ scope.row.maintainShowModel.CarLicense }}</p>
+                  <p>类型: {{ scope.row.maintainShowModel.Type }}</p>
+                  <p>开始时间: {{ scope.row.maintainShowModel.StartDate | formatDate('yyyy-MM-dd hh:mm:ss') }}</p>
+                  <p>归还时间: {{ scope.row.maintainShowModel.ReturnDate | formatDate('yyyy-MM-dd hh:mm:ss') }}</p>
+                  <div slot="reference" class="name-wrapper">
+                    <el-tag>维修单</el-tag>
+                  </div>
+                </el-popover>
+              </div>
+            </template>
             <template v-else-if="col.model === 'EntryDate'">
               {{ scope.row.EntryDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
             </template>
@@ -101,8 +124,7 @@ export default {
         { label: '总金额', model: 'TotalPrice' },
         { label: '入库时间', model: 'EntryDate' },
         { label: '批次', model: 'Batch' },
-        { label: '供应商编号', model: 'SupplierId' },
-        { label: '供应商', model: 'SupplierName' },
+        { label: '来源', model: 'IsMaintain' },
         { label: '备注', model: 'Description' }
       ],
       size: 10,
@@ -134,7 +156,7 @@ export default {
     handleDelete(index, row) {
       this.$confirm('确认删除?(' + row.EntryNo + ')')
         .then(() => {
-          delEntry({ Id: row.Id, EntryNo: row.ProductName }).then(() => {
+          delEntry({ Id: row.Id, EntryNo: row.EntryNo }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

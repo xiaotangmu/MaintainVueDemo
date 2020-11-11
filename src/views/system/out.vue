@@ -29,10 +29,6 @@
               label="品牌"
             />
             <el-table-column
-              prop="Unit"
-              label="组合"
-            />
-            <el-table-column
               prop="Alarm"
               label="警报值"
             />
@@ -41,13 +37,6 @@
             >
               <template slot-scope="scope">
                 {{ scope.row.Tool === 0 ? "配件" : "工具" }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="新旧"
-            >
-              <template slot-scope="scope">
-                {{ scope.row }}
               </template>
             </el-table-column>
             <el-table-column
@@ -128,8 +117,8 @@ export default {
         { label: '总金额', model: 'TotalPrice' },
         { label: '出库时间', model: 'OutDate' },
         { label: '批次', model: 'Batch' },
-        { label: '供应商编号', model: 'SupplierId' },
-        { label: '供应商', model: 'SupplierName' },
+        { label: '客户编号', model: 'ClientId' },
+        { label: '客户', model: 'ClientName' },
         { label: '备注', model: 'Description' }
       ],
       size: 10,
@@ -159,9 +148,9 @@ export default {
       this.$refs.editModal.edit(row)
     },
     handleDelete(index, row) {
-      this.$confirm('确认删除?(' + row.EntryNo + ')')
+      this.$confirm('确认删除?(' + row.OutNo + ')')
         .then(() => {
-          delOut({ Id: row.Id, EntryNo: row.ProductName }).then(() => {
+          delOut({ Id: row.Id, EntryNo: row.OutNo }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

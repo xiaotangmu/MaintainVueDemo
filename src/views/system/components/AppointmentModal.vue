@@ -84,6 +84,7 @@ export default {
       this.loading = true
       if (this.type === '新增') {
         addAppointment(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -92,6 +93,7 @@ export default {
         })
       } else {
         updAppointment(this.modal).then(() => {
+          this.success()
           this.$emit('handleSuccess')
           this.loading = false
           this.dialogVisible = false
@@ -115,9 +117,16 @@ export default {
       }
     },
     edit(row) {
+      const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
-      this.modal = row
+      this.modal = obj
+    },
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
+      })
     }
   }
 }
