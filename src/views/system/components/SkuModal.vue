@@ -9,75 +9,89 @@
       <!-- <el-form-item label="库存名">
         <el-input v-model="modal.SkuName" disabled />
       </el-form-item> -->
-      <el-col :span="12">
-        <el-form-item v-show="!disable" label="所属一级目录">
-          <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
-            <el-option
-              v-for="item in options"
-              :key="item.Id"
-              :label="item.CatalogName"
-              :value="item.Id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item v-show="!disable" label="所属二级级目录" prop="Catalog2Id">
-          <el-select v-model="modal.Catalog2Id" placeholder="请选择" style="width: 100%;">
-            <el-option
-              v-for="item in catalogList"
-              :key="item.Id"
-              :label="item.CatalogName"
-              :value="item.Id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item v-show="!disable" label="标准产品">
-          <el-select v-model="modal.SpuId" placeholder="请选择" style="width: 100%;">
-            <el-option
-              v-for="item in spuList"
-              :key="item.Id"
-              :label="item.ProductName"
-              :value="item.Id"
-            />
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="库存描述">
-          <el-input v-model="modal.Description" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="警报值">
-          <el-input v-model="modal.Alarm" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="品牌">
-          <el-input v-model="modal.Brand" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="单价">
-          <el-input-number v-model="modal.Price" :precision="2" :step="1" />
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="配件/工具">
-          <el-select v-model="modal.Tool">
-            <el-option :value="0" label="配件" />
-            <el-option :value="1" label="工具" />
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12">
-        <el-form-item label="总数">
-          <el-input-number v-model="modal.TotalCount" disabled :step="1" />
-        </el-form-item>
-      </el-col>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item v-show="!disable" label="所属一级目录">
+            <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
+              <el-option
+                v-for="item in options"
+                :key="item.Id"
+                :label="item.CatalogName"
+                :value="item.Id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item v-show="!disable" label="所属二级级目录" prop="Catalog2Id">
+            <el-select v-model="modal.Catalog2Id" placeholder="请选择" style="width: 100%;">
+              <el-option
+                v-for="item in catalogList"
+                :key="item.Id"
+                :label="item.CatalogName"
+                :value="item.Id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item v-show="!disable" label="标准产品">
+            <el-select v-model="modal.SpuId" placeholder="请选择" style="width: 100%;">
+              <el-option
+                v-for="item in spuList"
+                :key="item.Id"
+                :label="item.ProductName"
+                :value="item.Id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="库存描述">
+            <el-input v-model="modal.Description" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="警报值">
+            <el-input v-model="modal.Alarm" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="品牌">
+            <el-input v-model="modal.Brand" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="单价">
+            <el-input-number v-model="modal.Price" :precision="2" :step="1" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="配件/工具">
+            <el-select v-model="modal.Tool">
+              <el-option :value="0" label="配件" />
+              <el-option :value="1" label="工具" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="总数">
+            <el-input-number v-model="modal.TotalCount" disabled :step="1" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-collapse v-model="activeNames" style="padding: 0 20px;">
+          <el-collapse-item title="属性" name="1">
+            <div v-for="i in attrList" :key="i.AttrName">
+              {{ i.AttrName }}:
+              <el-checkbox-group v-model="checkedAttrs">
+                <el-checkbox v-for="j in i.ValueList" :key="j.Value" :label="i.AttrName + '@_@' + j.Value + '@_@' + j.Id">{{ j.Value }}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+      </el-row>
 
       <el-card class="box-card" style="width: 100%;">
         <div slot="header" class="clearfix">
@@ -165,12 +179,14 @@
 </template>
 
 <script>
-import { getById } from '@/api/system/product'
+import { getById, getAttrList } from '@/api/system/product'
 import { addSku, updSku } from '@/api/system/sku'
 import { getList, getListBy1 } from '@/api/category/catalog'
 export default {
   data() {
     return {
+      checkedAttrs: [],
+      activeNames: ['1'],
       attrIndex: '',
       value: {
         Room: '',
@@ -191,6 +207,7 @@ export default {
         Price: '',
         Tool: '',
         TotalCount: 20,
+        attrList: [],
         addressList: []
       },
       loading: false,
@@ -202,7 +219,8 @@ export default {
       catalogList: [],
       spuList: [],
       valueTitle: '',
-      addrIndex: ''
+      addrIndex: '',
+      attrList: []
     }
   },
   computed: {
@@ -216,14 +234,30 @@ export default {
     }
   },
   watch: {
+    checkedAttrs(val) {
+      this.modal.attrList = val.map(_ => {
+        const arr = _.split('@_@')
+        return {
+          AttrName: arr[0],
+          SpuAttrValueId: arr[2],
+          Value: arr[1]
+        }
+      })
+    },
     totalCount(val) {
       this.modal.TotalCount = val
     },
     'modal.SpuId'(val) {
+      if (!val) {
+        return
+      }
       this.spuList.forEach(i => {
         if (val === i.Id) {
           this.modal.SkuName = i.ProductName
         }
+      })
+      getAttrList({ spuId: val }).then(res => {
+        this.attrList = res.data
       })
     },
     catalog1Id(val) {
@@ -314,6 +348,7 @@ export default {
     add() {
       this.type = '新增'
       this.dialogVisible = true
+      this.checkedAttrs = []
       this.modal = {
         SpuId: '',
         Catalog2Id: '',
@@ -322,6 +357,7 @@ export default {
         Brand: '',
         Price: '',
         Tool: '',
+        attrList: [],
         addressList: []
       }
     },
@@ -330,6 +366,7 @@ export default {
       this.type = '编辑'
       this.dialogVisible = true
       this.modal = obj
+      this.checkedAttrs = this.modal.attrList.map(_ => _.AttrName + '@_@' + _.Value + '@_@' + _.SpuAttrValueId)
     },
     success() {
       this.$message({

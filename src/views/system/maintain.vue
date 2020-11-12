@@ -1,7 +1,32 @@
 <template>
   <div class="sku-container">
+    <el-input v-model="search.SearchStr" placeholder="模糊查询" style="width: 300px;" />
+    <el-date-picker
+      v-model="search.StartTime"
+      type="datetime"
+      placeholder="选择开始时间"
+      style="width: 300px;"
+    />
+    <el-date-picker
+      v-model="search.EndTime"
+      type="datetime"
+      placeholder="选择结束时间"
+      style="width: 300px;"
+    />
+    <el-select v-model="search.Status" style="width: 150px;">
+      <el-option :value="-1" :label="'全部'" />
+      <el-option :value="1" :label="'未处理'" />
+      <el-option :value="2" :label="'已处理'" />
+      <el-option :value="3" :label="'维修取消'" />
+    </el-select>
+    <el-button type="primary" icon="el-icon-plus" @click="getList()">查询</el-button>
     <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
-    <el-table :data="tableData" style="width: 100%" stripe>
+    <el-button v-if="multipleSelection.length" type="danger" @click="deleteBatch()">删除选中</el-button>
+    <el-table :data="tableData" style="width: 100%" stripe @selection-change="handleSelectionChange">
+      <el-table-column
+        type="selection"
+        width="55"
+      />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -162,7 +187,7 @@
 </template>
 
 <script>
-import { getMaintainList, delMaintain } from '@/api/system/maintain'
+import { getMaintainList, delMaintain, delMaintainBatch } from '@/api/system/maintain'
 import { delEmpty } from '@/utils/utils'
 import EditModal from './components/MaintainModal'
 export default {
@@ -171,6 +196,13 @@ export default {
   },
   data() {
     return {
+      multipleSelection: [],
+      search: {
+        SearchStr: '',
+        StartTime: '',
+        EndTime: '',
+        Status: -1
+      },
       activeName: 'first',
       column: [
         { label: '维修员工', model: 'Staff' },
@@ -189,12 +221,39 @@ export default {
     this.getList()
   },
   methods: {
+    deleteBatch() {
+      this.$confirm('确认删除?')
+        .then(() => {
+          delMaintainBatch(this.multipleSelection.map(i => {
+            return {
+              Id: i.Id,
+              MaintainNo: i.MaintainNo
+            }
+          })).then(() => {
+            this.success()
+            this.getList()
+          })
+        })
+        .catch(() => {})
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
     handleSizeChange(val) {
       this.size = val
       this.getList()
     },
     getList() {
-      getMaintainList(delEmpty({ Status: -1, ToolStatus: -1, OldPartStatus: -1, PageIndex: this.currentPage, PageSize: this.size })).then(res => {
+      getMaintainList(delEmpty({
+        Status: this.search.Status,
+        ToolStatus: -1,
+        OldPartStatus: -1,
+        SearchStr: this.search.SearchStr,
+        StartTime: this.search.StartTime,
+        EndTime: this.search.EndTime,
+        PageIndex: this.currentPage,
+        PageSize: this.size
+      })).then(res => {
         this.tableData = res.data.Items
         this.total = res.data.TotalCount
       })

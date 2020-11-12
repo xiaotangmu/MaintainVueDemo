@@ -90,10 +90,10 @@
           </el-form-item>
         </el-col>
       </el-card>
-      <el-col :span="6" style="position: absolute; right: 10px; z-index: 1000;">
+      <el-col :span="9" style="position: absolute; right: 10px; z-index: 1000;">
         <el-form-item label="出库表">
           <el-select v-model="outId" :disabled="disable" style="width: 100%;">
-            <el-option v-for="i in outList" :key="i.Id" :value="i.Id" :label="i.Description" />
+            <el-option v-for="i in outList" :key="i.Id" :value="i.Id" :label="i.OutNo" />
           </el-select>
         </el-form-item>
       </el-col>
@@ -258,7 +258,7 @@
             <el-option
               v-for="item in spuList"
               :key="item.Id"
-              :label="item.SkuName"
+              :label="item.SkuName + '(' + (item.Tool===0?'配件':'工具') + ')'"
               :value="item.Id"
             />
           </el-select>

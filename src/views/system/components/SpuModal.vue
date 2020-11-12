@@ -40,7 +40,7 @@
         <div v-for="(attrItem, index) in spu.SpuAttrModelList" :key="attrItem.Id" class="clearfix" style="position: relative;padding: 5px;">
           {{ attrItem.AttrName }}:
           <el-tag style="margin-right: 5px; cursor: pointer;" @click="newAttrValue(index)">+</el-tag>
-          <el-tag v-for="(j, valueIndex) in attrItem.ValueList" :key="j.Id" style="margin-right: 5px;" type="primary" closable @close="delAttrValue(valueIndex)">
+          <el-tag v-for="(j, valueIndex) in attrItem.ValueList" :key="j.Id" style="margin-right: 5px;" type="primary" closable @close="delAttrValue(index, valueIndex)">
             {{ j.Value }}
           </el-tag>
           <el-button type="danger" style="float: right;" @click="delAttrItem(index)">删除</el-button>
@@ -161,8 +161,8 @@ export default {
     })
   },
   methods: {
-    delAttrValue(index) {
-      this.spu.SpuAttrModelList[this.attrIndex].ValueList.splice(index, 1)
+    delAttrValue(index, indexItem) {
+      this.spu.SpuAttrModelList[index].ValueList.splice(indexItem, 1)
     },
     addAttrValue() {
       this.spu.SpuAttrModelList[this.attrIndex].ValueList.push({

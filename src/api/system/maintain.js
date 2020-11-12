@@ -17,7 +17,7 @@ export function getMaintainById(params) {
 }
 export function getMaintainAll(params) {
   return request({
-    url: url + '/Maintain/GetAll',
+    url: url + '/Maintain/GetNoDealToolOrPartWithMaintain',
     method: 'get',
     params
   })
@@ -55,5 +55,12 @@ export function delMaintain(data) {
     url: url + '/Maintain/Delete',
     method: 'delete',
     params: data
+  })
+}
+export function delMaintainBatch(data) {
+  return request({
+    url: url + '/Maintain/DeleteBatch',
+    method: 'delete',
+    data
   })
 }

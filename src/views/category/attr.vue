@@ -8,6 +8,7 @@
           :load="loadNode"
           accordion
           lazy
+          style="font-weight: bold;"
           @node-click="handleNodeClick"
         />
       </el-aside>
@@ -62,7 +63,7 @@ export default {
       this.$confirm(`确认删除?`, { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' })
         .then(_ => {
           delAttrBatch(this.multipleSelection).then(() => {
-            this.opeModal({}, 'delete')
+            this.getList()
           })
         })
         .catch(_ => {})

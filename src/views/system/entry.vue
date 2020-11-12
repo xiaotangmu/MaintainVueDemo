@@ -1,7 +1,14 @@
 <template>
   <div class="sku-container">
+    <el-input v-model="search.SearchStr" placeholder="模糊查询" style="width: 300px;" />
+    <el-button type="primary" icon="el-icon-plus" @click="getList()">查询</el-button>
     <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
-    <el-table :data="tableData" style="width: 100%" stripe>
+    <el-button v-if="multipleSelection.length" type="danger" @click="deleteBatch()">删除选中</el-button>
+    <el-table :data="tableData" style="width: 100%" stripe @selection-change="handleSelectionChange">
+      <el-table-column
+        type="selection"
+        width="55"
+      />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -21,12 +28,13 @@
             style="width: 100%"
           >
             <el-table-column
-              label="总金额"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price * scope.row.TotalCount | toMoney }}
-              </template>
-            </el-table-column>
+              prop="SkuName"
+              label="名称"
+            />
+            <el-table-column
+              prop="TotalCount"
+              label="数量"
+            />
             <el-table-column
               label="单价"
             >
@@ -35,9 +43,12 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="TotalCount"
-              label="数量"
-            />
+              label="总金额"
+            >
+              <template slot-scope="scope">
+                {{ scope.row.Price * scope.row.TotalCount | toMoney }}
+              </template>
+            </el-table-column>
             <el-table-column
               label="新旧"
             >
@@ -65,6 +76,14 @@
                 <el-popover trigger="hover" placement="top">
                   <p>供应商编号: {{ scope.row.SupplierId }}</p>
                   <p>供应商: {{ scope.row.SupplierName }}</p>
+                  <div slot="reference" class="name-wrapper">
+                    <el-tag>供应商</el-tag>
+                  </div>
+                </el-popover>
+              </div>
+              <div v-else-if="scope.row.maintainShowModel === null">
+                <el-popover trigger="hover" placement="top">
+                  <p>对应维修单已删除</p>
                   <div slot="reference" class="name-wrapper">
                     <el-tag>供应商</el-tag>
                   </div>
@@ -109,7 +128,7 @@
 </template>
 
 <script>
-import { getEntryList, delEntry } from '@/api/system/entry'
+import { getEntryList, delEntry, delEntryBatch } from '@/api/system/entry'
 import { delEmpty } from '@/utils/utils'
 import EditModal from './components/EntryModal'
 export default {
@@ -118,6 +137,10 @@ export default {
   },
   data() {
     return {
+      multipleSelection: [],
+      search: {
+        SearchStr: ''
+      },
       column: [
         { label: '入库单号', model: 'EntryNo' },
         { label: '操作员', model: 'Operator' },
@@ -137,12 +160,30 @@ export default {
     this.getList()
   },
   methods: {
+    deleteBatch() {
+      this.$confirm('确认删除?')
+        .then(() => {
+          delEntryBatch(this.multipleSelection.map(i => {
+            return {
+              Id: i.Id,
+              EntryNo: i.EntryNo
+            }
+          })).then(() => {
+            this.success()
+            this.getList()
+          })
+        })
+        .catch(() => {})
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
     handleSizeChange(val) {
       this.size = val
       this.getList()
     },
     getList() {
-      getEntryList(delEmpty({ PageIndex: this.currentPage, PageSize: this.size })).then(res => {
+      getEntryList(delEmpty({ PageIndex: this.currentPage, PageSize: this.size, SearchStr: this.search.SearchStr })).then(res => {
         this.tableData = res.data.Items
         this.total = res.data.TotalCount
       })

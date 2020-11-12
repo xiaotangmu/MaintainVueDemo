@@ -22,6 +22,13 @@ export function delEntry(data) {
     params: data
   })
 }
+export function delEntryBatch(data) {
+  return request({
+    url: url + '/Entry/DeleteBatch',
+    method: 'delete',
+    data
+  })
+}
 export function updEntry(data) {
   return request({
     url: url + '/Entry/Update',

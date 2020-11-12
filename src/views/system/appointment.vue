@@ -1,7 +1,32 @@
 <template>
   <div class="sku-container">
+    <el-input v-model="search.SearchStr" placeholder="模糊查询" style="width: 300px;" />
+    <el-date-picker
+      v-model="search.StartTime"
+      type="datetime"
+      placeholder="选择开始时间"
+      style="width: 300px;"
+    />
+    <el-date-picker
+      v-model="search.EndTime"
+      type="datetime"
+      placeholder="选择结束时间"
+      style="width: 300px;"
+    />
+    <el-select v-model="search.Status" style="width: 150px;">
+      <el-option :value="-1" :label="'全部'" />
+      <el-option :value="1" :label="'未处理'" />
+      <el-option :value="2" :label="'已处理'" />
+      <el-option :value="3" :label="'维修取消'" />
+    </el-select>
+    <el-button type="primary" icon="el-icon-plus" @click="getList()">查询</el-button>
     <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
-    <el-table :data="tableData" style="width: 100%" stripe>
+    <el-button v-if="multipleSelection.length" type="danger" @click="deleteBatch()">删除选中</el-button>
+    <el-table :data="tableData" style="width: 100%" stripe @selection-change="handleSelectionChange">
+      <el-table-column
+        type="selection"
+        width="55"
+      />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -50,7 +75,7 @@
 </template>
 
 <script>
-import { getAppointmentList, delAppointment } from '@/api/system/appointment'
+import { getAppointmentList, delAppointment, delAppointmentBatch } from '@/api/system/appointment'
 import { delEmpty } from '@/utils/utils'
 import EditModal from './components/AppointmentModal'
 export default {
@@ -59,6 +84,13 @@ export default {
   },
   data() {
     return {
+      multipleSelection: [],
+      search: {
+        SearchStr: '',
+        StartTime: '',
+        EndTime: '',
+        Status: -1
+      },
       column: [
         { label: '所属公司', model: 'CompanyId' },
         { label: '车牌号码', model: 'CarLicense' },
@@ -79,12 +111,37 @@ export default {
     this.getList()
   },
   methods: {
+    deleteBatch() {
+      this.$confirm('确认删除?')
+        .then(() => {
+          delAppointmentBatch(this.multipleSelection.map(i => {
+            return {
+              Id: i.Id,
+              AppointmentNo: i.AppointmentNo
+            }
+          })).then(() => {
+            this.success()
+            this.getList()
+          })
+        })
+        .catch(() => {})
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
     handleSizeChange(val) {
       this.size = val
       this.getList()
     },
     getList() {
-      getAppointmentList(delEmpty({ PageIndex: this.currentPage, PageSize: this.size, Status: -1 })).then(res => {
+      getAppointmentList(delEmpty({
+        PageIndex: this.currentPage,
+        PageSize: this.size,
+        Status: this.search.Status,
+        SearchStr: this.search.SearchStr,
+        StartTime: this.search.StartTime,
+        EndTime: this.search.EndTime
+      })).then(res => {
         this.tableData = res.data.Items
         this.total = res.data.TotalCount
       })

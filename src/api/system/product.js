@@ -8,6 +8,13 @@ export function getSpuList(params) {
     params
   })
 }
+export function getAttrList(params) {
+  return request({
+    url: url + '/Spu/GetSpuAttrListBySpuId',
+    method: 'get',
+    params
+  })
+}
 export function addSpu(data) {
   return request({
     url: url + '/Spu/Add',

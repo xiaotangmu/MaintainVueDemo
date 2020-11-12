@@ -36,3 +36,10 @@ export function updAppointment(data) {
     data
   })
 }
+export function delAppointmentBatch(data) {
+  return request({
+    url: url + '/Appointment/DeleteBatch',
+    method: 'delete',
+    data
+  })
+}

@@ -147,7 +147,7 @@
             <el-option
               v-for="item in spuList"
               :key="item.Id"
-              :label="item.SkuName"
+              :label="item.SkuName + '(' + (item.Tool===0?'配件':'工具') + ')'"
               :value="item.Id"
             />
           </el-select>
@@ -157,7 +157,7 @@
             <el-option
               v-for="item in addrList"
               :key="item.Id"
-              :label="'房间'+item.Room+ '  货架'+ item.Self"
+              :label="'房间'+item.Room+ '  货架'+ item.Self + '(' + (item.Status===0?'新':'旧') + ')'"
               :value="item.Id"
             />
           </el-select>
@@ -171,7 +171,7 @@
         <el-form-item label="总金额">
           <el-input-number v-model="value.TotalPrice" disabled :precision="2" style="width: 300px;" :step="1" />
         </el-form-item>
-        <el-form-item label="新旧">
+        <!-- <el-form-item label="新旧">
           <el-select v-model="value.Status" disabled style="width: 300px;">
             <el-option :value="0" label="新" />
             <el-option :value="1" label="旧" />
@@ -182,7 +182,7 @@
             <el-option :value="0" label="配件" />
             <el-option :value="1" label="工具" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="valueVisible = false">取 消</el-button>

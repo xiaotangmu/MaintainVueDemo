@@ -29,6 +29,13 @@ export function delOut(data) {
     params: data
   })
 }
+export function delOutBatch(data) {
+  return request({
+    url: url + '/Out/DeleteBatch',
+    method: 'delete',
+    data
+  })
+}
 export function updOut(data) {
   return request({
     url: url + '/Out/Update',
