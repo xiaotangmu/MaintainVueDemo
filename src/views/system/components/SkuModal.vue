@@ -62,7 +62,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="单价">
+          <el-form-item label="参考价格">
             <el-input-number v-model="modal.Price" :precision="2" :step="1" />
           </el-form-item>
         </el-col>
@@ -130,7 +130,7 @@
             label="数量"
           />
           <el-table-column
-            label="参考价格"
+            label="单价"
           >
             <template slot-scope="scope">
               {{ scope.row.Price | toMoney }}

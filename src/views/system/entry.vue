@@ -31,6 +31,10 @@
               label="名称"
             />
             <el-table-column
+              prop="Brand"
+              label="品牌"
+            />
+            <el-table-column
               label="属性"
             >
               <template slot-scope="scope">

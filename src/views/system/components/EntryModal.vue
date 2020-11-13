@@ -139,6 +139,10 @@
             label="库存名"
           />
           <el-table-column
+            prop="Brand"
+            label="品牌"
+          />
+          <el-table-column
             label="位置"
             align="center"
           >
@@ -318,6 +322,7 @@ export default {
       },
       attrIndex: '',
       value: {
+        Brand: '',
         SkuId: '',
         SkuName: '',
         Quantity: '',
@@ -464,11 +469,13 @@ export default {
       if (index < 0) {
         this.addrList = []
         this.value.SkuName = ''
+        this.value.Brand = ''
         this.value.AttrList = []
         return
       }
       this.addrList = this.spuList[index].addressList
       this.value.SkuName = this.spuList[index].SkuName
+      this.value.Brand = this.spuList[index].Brand
       this.value.AttrList = this.spuList[index].AttrList
     },
     'value.AddressId'(val) {
@@ -550,7 +557,8 @@ export default {
         OldPartId: '',
         ToolId: '',
         Status: null,
-        AttrList: []
+        AttrList: [],
+        Brand: ''
       }
     },
     handleDelete(index) {
@@ -632,7 +640,8 @@ export default {
           OldPartId: '',
           ToolId: '',
           Status: i.Status,
-          AttrList: i.AttrList
+          AttrList: i.AttrList,
+          Brand: i.Brand
         }
       })
     },
