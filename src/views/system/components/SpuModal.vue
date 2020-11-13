@@ -65,7 +65,7 @@
               v-for="item in attrList"
               :key="item.Id"
               :label="item.AttrName"
-              :value="item.Id + '***' + item.AttrName"
+              :value="JSON.stringify(item)"
             />
           </el-select>
         </el-form-item>
@@ -183,10 +183,11 @@ export default {
         .catch(() => {})
     },
     addAttrItem() {
+      const obj = JSON.parse(this.attr.AttrId)
       this.spu.SpuAttrModelList.push({
         ValueList: [],
-        AttrId: this.attr.AttrId.split('***')[0],
-        AttrName: this.attr.AttrId.split('***')[1]
+        AttrId: obj.Id,
+        AttrName: obj.AttrName
       })
       this.attrVisible = false
     },
@@ -195,26 +196,30 @@ export default {
       this.attrVisible = true
     },
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addSpu(this.spu).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updSpu(this.spu).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addSpu(this.spu).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updSpu(this.spu).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
     add() {
       this.type = '新增'

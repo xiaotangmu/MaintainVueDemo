@@ -4,7 +4,7 @@
     :visible.sync="dialogVisible"
     width="50%"
   >
-    <el-form ref="ruleForm" :model="catalog" label-width="120px">
+    <el-form ref="ruleForm" :rules="rule" :model="catalog" label-width="120px">
       <el-form-item label="层级">
         <el-select v-model="nested" :disabled="disable" placeholder="请选择" style="width: 100%;">
           <el-option
@@ -27,7 +27,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="目录名称">
+      <el-form-item label="目录名称" prop="CatalogName">
         <el-input v-model="catalog.CatalogName" />
       </el-form-item>
     </el-form>
@@ -51,6 +51,9 @@ export default {
         CatalogName: '',
         Catalog1Id: ''
       },
+      rule: {
+        CatalogName: [{ required: true, message: '请输入目录名称', trigger: 'blur' }]
+      },
       options: [],
       loading: false
     }
@@ -67,36 +70,43 @@ export default {
   },
   methods: {
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        if (this.nested === 1) {
-          addCatalog1({ CatalogName: this.catalog.CatalogName }).then(() => {
-            this.success()
-          }).catch(() => {
-            this.loading = false
-          })
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            if (this.nested === 1) {
+              addCatalog1({ CatalogName: this.catalog.CatalogName }).then(() => {
+                this.success()
+              }).catch(() => {
+                this.loading = false
+              })
+            } else {
+              addCatalog2({ CatalogName: this.catalog.CatalogName, Catalog1Id: this.catalog.Catalog1Id }).then(() => {
+                this.success()
+              }).catch(() => {
+                this.loading = false
+              })
+            }
+          } else {
+            if (this.nested === 1) {
+              updateCatalog1({ CatalogName: this.catalog.CatalogName, Id: this.catalog.Id }).then(() => {
+                this.success()
+              }).catch(() => {
+                this.loading = false
+              })
+            } else {
+              updateCatalog2({ CatalogName: this.catalog.CatalogName, Catalog1Id: this.catalog.Catalog1Id, Id: this.catalog.Id }).then(() => {
+                this.success()
+              }).catch(() => {
+                this.loading = false
+              })
+            }
+          }
         } else {
-          addCatalog2({ CatalogName: this.catalog.CatalogName, Catalog1Id: this.catalog.Catalog1Id }).then(() => {
-            this.success()
-          }).catch(() => {
-            this.loading = false
-          })
+          console.log('error submit!!')
+          return false
         }
-      } else {
-        if (this.nested === 1) {
-          updateCatalog1({ CatalogName: this.catalog.CatalogName, Id: this.catalog.Id }).then(() => {
-            this.success()
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          updateCatalog2({ CatalogName: this.catalog.CatalogName, Catalog1Id: this.catalog.Catalog1Id, Id: this.catalog.Id }).then(() => {
-            this.success()
-          }).catch(() => {
-            this.loading = false
-          })
-        }
-      }
+      })
     },
     success() {
       this.$emit('handleSuccess')

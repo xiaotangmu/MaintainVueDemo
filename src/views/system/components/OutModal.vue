@@ -12,17 +12,17 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="操作员">
+        <el-form-item label="操作员" prop="Operator">
           <el-input v-model="modal.Operator" />
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="批次">
+        <el-form-item label="批次" prop="Batch">
           <el-input-number v-model="modal.Batch" :step="1" />
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="客户编号">
+        <el-form-item label="客户编号" prop="ClientId">
           <el-input v-model="modal.ClientId" />
         </el-form-item>
       </el-col>
@@ -32,7 +32,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="出库时间">
+        <el-form-item label="出库时间" prop="OutDate">
           <el-date-picker
             v-model="modal.OutDate"
             type="datetime"
@@ -66,7 +66,6 @@
             <template slot-scope="scope">
               <el-button
                 type="danger"
-                size="mini"
                 @click="handleDelete(scope.$index)"
               >删除</el-button>
             </template>
@@ -75,6 +74,16 @@
             prop="SkuName"
             label="库存名"
           />
+          <el-table-column
+            label="属性"
+          >
+            <template slot-scope="scope">
+              <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                {{ i.AttrName }}
+                {{ i.Value }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="Quantity"
             label="数量"
@@ -121,7 +130,7 @@
       width="40%"
       center
     >
-      <el-form label-width="80px" style="padding: 20px;">
+      <el-form ref="valueForm" label-width="80px" style="padding: 20px;" :model="value" :rules="valueRule">
         <el-form-item v-show="!itemDisable" label="所属一级目录">
           <el-select v-model="catalog1Id" placeholder="请选择" style="width: 300px;">
             <el-option
@@ -142,7 +151,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-show="!itemDisable" label="库存">
+        <el-form-item v-show="!itemDisable" label="库存" prop="SkuId">
           <el-select v-model="value.SkuId" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in spuList"
@@ -152,7 +161,13 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="位置">
+        <el-form-item v-show="!itemDisable" label="属性">
+          <el-tag v-for="i in value.AttrList" :key="i.Id">
+            {{ i.AttrName }}
+            {{ i.Value }}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label="位置" prop="AddressId">
           <el-select v-model="value.AddressId" :disabled="itemDisable" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in addrList"
@@ -214,7 +229,8 @@ export default {
         AddressId: '',
         TotalPrice: '',
         Tool: '',
-        Status: ''
+        Status: '',
+        AttrList: []
       },
       valueVisible: false,
       dialogVisible: false,
@@ -234,8 +250,15 @@ export default {
       options: [],
       catalog1Id: '',
       Catalog2Id: '',
+      valueRule: {
+        AddressId: [{ required: true, message: '请选择位置', trigger: 'blur' }],
+        SkuId: [{ required: true, message: '请选择库存', trigger: 'blur' }]
+      },
       rule: {
-        Catalog2Id: [{ required: true, message: '请请选择目录', trigger: 'blur' }]
+        Operator: [{ required: true, message: '请输入操作员', trigger: 'blur' }],
+        OutDate: [{ required: true, message: '请选择出库日期', trigger: 'blur' }],
+        Batch: [{ required: true, message: '请输入批次', trigger: 'blur' }],
+        ClientId: [{ required: true, message: '请选择客户', trigger: 'blur' }]
       },
       catalogList: [],
       spuList: [],
@@ -297,11 +320,13 @@ export default {
         this.addrList = []
         this.value.Tool = ''
         this.value.SkuName = ''
+        this.value.AttrList = []
         return
       }
       this.addrList = this.spuList[index].addressList
       this.value.Tool = this.spuList[index].Tool
       this.value.SkuName = this.spuList[index].SkuName
+      this.value.AttrList = this.spuList[index].AttrList
     },
     'value.AddressId'(val) {
       this.maxCount = 0
@@ -328,12 +353,16 @@ export default {
   },
   methods: {
     addItem() {
-      if (this.valueTitle === '添加出库信息') {
-        this.modal.outSkuList.push(this.value)
-      } else {
-        this.modal.outSkuList.splice(this.addrIndex, 1, this.value)
-      }
-      this.valueVisible = false
+      this.$refs.valueForm.validate((valid) => {
+        if (valid) {
+          if (this.valueTitle === '添加出库信息') {
+            this.modal.outSkuList.push(this.value)
+          } else {
+            this.modal.outSkuList.splice(this.addrIndex, 1, this.value)
+          }
+          this.valueVisible = false
+        }
+      })
     },
     newItem() {
       this.valueVisible = true
@@ -346,7 +375,8 @@ export default {
         AddressId: '',
         TotalPrice: '',
         Tool: '',
-        Status: null
+        Status: null,
+        AttrList: []
       }
     },
     handleDelete(index) {
@@ -357,26 +387,30 @@ export default {
         .catch(() => {})
     },
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addOut(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updOut(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addOut(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updOut(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
     add() {
       this.type = '新增'
@@ -407,7 +441,8 @@ export default {
           AddressId: i.AddressId,
           TotalPrice: i.TotalCount * i.Price,
           Tool: i.Tool,
-          Status: 0
+          Status: 0,
+          AttrList: i.AttrList
         }
       })
     },

@@ -79,25 +79,32 @@ export default {
   },
   methods: {
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addAttr({ AttrName: this.attr.AttrName,
-          CatalogId: this.attr.CatalogId }).then(() => {
-          this.$emit('handleSuccess', {}, 'add')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updAttr(this.attr).then(() => {
-          this.$emit('handleSuccess', this.attr, 'update', this.index)
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addAttr({ AttrName: this.attr.AttrName,
+              CatalogId: this.attr.CatalogId }).then(() => {
+              this.$emit('handleSuccess', {}, 'add')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updAttr(this.attr).then(() => {
+              this.$emit('handleSuccess', this.attr, 'update', this.index)
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     add() {
       this.type = '新增'

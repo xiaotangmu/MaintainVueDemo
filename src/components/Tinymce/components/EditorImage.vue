@@ -1,6 +1,6 @@
 <template>
   <div class="upload-container">
-    <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
+    <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" type="primary" @click=" dialogVisible=true">
       上传
     </el-button>
     <el-dialog :visible.sync="dialogVisible">
@@ -15,7 +15,7 @@
         action="https://httpbin.org/post"
         list-type="picture-card"
       >
-        <el-button size="small" type="primary">
+        <el-button type="primary">
           点击上传
         </el-button>
       </el-upload>

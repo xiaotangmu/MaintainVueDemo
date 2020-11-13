@@ -20,10 +20,9 @@
         <el-table :data="tableData" style="width: 100%" stripe>
           <el-table-column align="left" width="180px" label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 type="danger"
-                size="mini"
                 @click="handleDelete(scope.$index, scope.row)"
               >删除</el-button>
             </template>
@@ -86,8 +85,9 @@
                 <template v-else-if="col.model === 'Price'">
                   {{ scope.row[col.model] | toMoney }}
                 </template>
-                <template v-else-if="col.model === 'attrList'">
+                <template v-else-if="col.model === 'AttrList'">
                   <el-tag v-for="i in scope.row[col.model]" :key="i.Id">
+                    {{ i.AttrName }}
                     {{ i.Value }}
                   </el-tag>
                 </template>
@@ -142,7 +142,7 @@ export default {
         { label: '品牌', model: 'Brand' },
         { label: '金额', model: 'Price' },
         { label: '数量', model: 'TotalCount' },
-        { label: '属性', model: 'attrList' },
+        { label: '属性', model: 'AttrList' },
         { label: '配件/工具', model: 'Tool' }
       ],
       size: 10,

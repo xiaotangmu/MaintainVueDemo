@@ -18,12 +18,11 @@
         </el-input>
         <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
         <el-table :data="tableData" style="width: 100%" stripe>
-          <el-table-column align="left" width="160px" label="操作">
+          <el-table-column align="left" label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 type="danger"
-                size="mini"
                 @click="handleDelete(scope.$index, scope.row)"
               >删除</el-button>
             </template>

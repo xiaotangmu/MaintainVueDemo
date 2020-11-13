@@ -6,16 +6,16 @@
     width="60%"
     top="10px"
   >
-    <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="90px">
+    <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="100px">
       <el-divider content-position="left">基本信息</el-divider>
       <el-row>
         <el-col :span="8">
-          <el-form-item label="维修员工">
+          <el-form-item label="维修员工" prop="Staff">
             <el-input v-model="modal.Staff" />
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="状态">
+          <el-form-item label="状态" prop="Status">
             <el-select v-model="modal.Status" style="width: 100%;">
               <el-option :value="1" :label="'未处理'" />
               <el-option :value="2" :label="'已处理'" />
@@ -24,12 +24,12 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="负责人">
+          <el-form-item label="负责人" prop="Operator">
             <el-input v-model="modal.Operator" />
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="创建时间">
+          <el-form-item label="创建时间" prop="StartDate">
             <el-date-picker
               v-model="modal.StartDate"
               type="datetime"
@@ -40,7 +40,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="归还时间">
+          <el-form-item label="归还时间" prop="ReturnDate">
             <el-date-picker
               v-model="modal.ReturnDate"
               type="datetime"
@@ -58,7 +58,7 @@
       <el-divider content-position="left" />
       <el-card class="box-card" style="margin-bottom: 20px;">
         <div slot="header" class="clearfix">
-          <el-form-item label="维修预约单" style="margin-bottom: 0;">
+          <el-form-item label="维修预约单" style="margin-bottom: 0;" prop="AppointmentId">
             <el-select v-model="modal.AppointmentId" :disabled="disable" style="width: 300px;">
               <el-option v-for="i in appointmentList" :key="i.Id" :value="i.Id" :label="i.CarLicense" />
             </el-select>
@@ -112,6 +112,16 @@
                 label="名称"
               />
               <el-table-column
+                label="属性"
+              >
+                <template slot-scope="scope">
+                  <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    {{ i.AttrName }}
+                    {{ i.Value }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
                 prop="Num"
                 label="数量"
               />
@@ -158,6 +168,16 @@
                 label="名称"
               />
               <el-table-column
+                label="属性"
+              >
+                <template slot-scope="scope">
+                  <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    {{ i.AttrName }}
+                    {{ i.Value }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
                 prop="Price"
                 label="单价"
               />
@@ -191,10 +211,9 @@
             >
               <el-table-column align="left" width="180px" label="操作">
                 <template slot-scope="scope">
-                  <el-button size="mini" :disabled="scope.row.disable" @click="handleEdit2(scope.$index, scope.row)">编辑</el-button>
+                  <el-button :disabled="scope.row.disable" @click="handleEdit2(scope.$index, scope.row)">编辑</el-button>
                   <el-button
                     type="danger"
-                    size="mini"
                     :disabled="scope.row.disable"
                     @click="handleDelete2(scope.$index)"
                   >删除</el-button>
@@ -204,6 +223,16 @@
                 prop="SkuName"
                 label="名称"
               />
+              <el-table-column
+                label="属性"
+              >
+                <template slot-scope="scope">
+                  <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    {{ i.AttrName }}
+                    {{ i.Value }}
+                  </el-tag>
+                </template>
+              </el-table-column>
               <el-table-column
                 prop="Price"
                 label="单价"
@@ -221,10 +250,12 @@
         </el-tab-pane>
       </el-tabs>
     </el-form>
+
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancel">取 消</el-button>
       <el-button v-show="!disable" type="primary" :loading="loading" @click="submit">确 定</el-button>
     </span>
+
     <el-dialog
       :title="valueTitle"
       :visible.sync="valueVisible"
@@ -232,7 +263,7 @@
       width="40%"
       center
     >
-      <el-form label-width="100px" style="padding: 20px;">
+      <el-form ref="valueForm" label-width="100px" style="padding: 20px;" :model="value" :rules="valueRule">
         <el-form-item v-show="!itemDisable" label="所属一级目录">
           <el-select v-model="catalog1Id" placeholder="请选择" style="width: 300px;">
             <el-option
@@ -253,7 +284,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-show="!itemDisable" label="库存名">
+        <el-form-item v-show="!itemDisable" label="库存名" prop="SkuId">
           <el-select v-model="value.SkuId" placeholder="请选择" style="width: 300px;">
             <el-option
               v-for="item in spuList"
@@ -262,6 +293,12 @@
               :value="item.Id"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item v-show="!itemDisable" label="属性">
+          <el-tag v-for="i in value.AttrList" :key="i.Id">
+            {{ i.AttrName }}
+            {{ i.Value }}
+          </el-tag>
         </el-form-item>
         <el-form-item label="数量">
           <el-input-number v-model="value.Num" style="width: 300px;" :step="1" />
@@ -343,8 +380,16 @@ export default {
         OutIdList: []
       },
       loading: false,
+      valueRule: {
+        SkuId: [{ required: true, message: '请选择库存', trigger: 'blur' }]
+      },
       rule: {
-        // Catalog2Id: [{ required: true, message: '请选择目录', trigger: 'blur' }]
+        Staff: [{ required: true, message: '请输入维修员工', trigger: 'blur' }],
+        AppointmentId: [{ required: true, message: '请选择预约单', trigger: 'blur' }],
+        StartDate: [{ required: true, message: '请选择创建时间', trigger: 'blur' }],
+        Status: [{ required: true, message: '请选择状态', trigger: 'blur' }],
+        ReturnDate: [{ required: true, message: '请选择归还时间', trigger: 'blur' }],
+        Operator: [{ required: true, message: '请输入负责人', trigger: 'blur' }]
       },
       valueTitle: '',
       addrIndex: ''
@@ -386,9 +431,11 @@ export default {
       })
       if (index < 0) {
         this.value.SkuName = ''
+        this.value.AttrList = []
         return
       }
       this.value.SkuName = this.spuList[index].SkuName
+      this.value.AttrList = this.spuList[index].AttrList
     },
     outId(val) {
       if (!val || this.type === '编辑') {
@@ -403,7 +450,7 @@ export default {
             SkuName: i.SkuName,
             Brand: i.Brand,
             Unit: i.Unit,
-            AttrList: i.attrList,
+            AttrList: i.AttrList,
             Id: i.Id,
             Remark: i.Description,
             OutSkuId: i.Id,
@@ -418,7 +465,7 @@ export default {
             SkuName: i.SkuName,
             Brand: i.Brand,
             Unit: i.Unit,
-            AttrList: i.attrList,
+            AttrList: i.AttrList,
             Id: i.Id,
             Price: i.Price,
             Remark: i.Description,
@@ -461,16 +508,20 @@ export default {
       this.valueTitle = '修改配件信息'
     },
     addItem() {
-      const obj = JSON.parse(JSON.stringify(this.value))
-      if (this.disable) {
-        obj.MaintainId = this.maintainId
-      }
-      if (this.valueTitle === '添加配件信息') {
-        this.modal.OldPartList.push(obj)
-      } else {
-        this.modal.OldPartList.splice(this.addrIndex, 1, obj)
-      }
-      this.valueVisible = false
+      this.$refs.valueForm.validate((valid) => {
+        if (valid) {
+          const obj = JSON.parse(JSON.stringify(this.value))
+          if (this.disable) {
+            obj.MaintainId = this.maintainId
+          }
+          if (this.valueTitle === '添加配件信息') {
+            this.modal.OldPartList.push(obj)
+          } else {
+            this.modal.OldPartList.splice(this.addrIndex, 1, obj)
+          }
+          this.valueVisible = false
+        }
+      })
     },
     newItem2() {
       this.valueVisible = true
@@ -526,17 +577,21 @@ export default {
       })
     },
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addMaintain(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addMaintain(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
     cancel() {
       this.dialogVisible = false

@@ -35,7 +35,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item v-show="!disable" label="标准产品">
+          <el-form-item v-show="!disable" label="标准产品" prop="SpuId">
             <el-select v-model="modal.SpuId" placeholder="请选择" style="width: 100%;">
               <el-option
                 v-for="item in spuList"
@@ -67,7 +67,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="配件/工具">
+          <el-form-item label="配件/工具" prop="Tool">
             <el-select v-model="modal.Tool">
               <el-option :value="0" label="配件" />
               <el-option :value="1" label="工具" />
@@ -86,7 +86,13 @@
             <div v-for="i in attrList" :key="i.AttrName">
               {{ i.AttrName }}:
               <el-checkbox-group v-model="checkedAttrs">
-                <el-checkbox v-for="j in i.ValueList" :key="j.Value" :label="i.AttrName + '@_@' + j.Value + '@_@' + j.Id">{{ j.Value }}</el-checkbox>
+                <el-checkbox
+                  v-for="j in i.ValueList"
+                  :key="j.Value"
+                  :label="JSON.stringify({ AttrName: i.AttrName,
+                                           SpuAttrValueId: j.Id,
+                                           Value: j.Value })"
+                >{{ j.Value }}</el-checkbox>
               </el-checkbox-group>
             </div>
           </el-collapse-item>
@@ -104,10 +110,9 @@
         >
           <el-table-column align="left" width="180px" label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 type="danger"
-                size="mini"
                 @click="handleDelete(scope.$index)"
               >删除</el-button>
             </template>
@@ -150,11 +155,11 @@
       width="33%"
       center
     >
-      <el-form label-width="80px">
-        <el-form-item label="房间">
+      <el-form ref="valueForm" label-width="80px" :model="value" :rules="valueRule">
+        <el-form-item label="房间" prop="Room">
           <el-input v-model="value.Room" style="width: 300px;" />
         </el-form-item>
-        <el-form-item label="货架">
+        <el-form-item label="货架" prop="Self">
           <el-input v-model="value.Self" style="width: 300px;" />
         </el-form-item>
         <el-form-item label="数量">
@@ -163,7 +168,7 @@
         <el-form-item label="参考价格">
           <el-input-number v-model="value.Price" :precision="2" :step="1" />
         </el-form-item>
-        <el-form-item label="新旧">
+        <el-form-item label="新旧" prop="Status">
           <el-select v-model="value.Status" style="width: 300px;">
             <el-option :value="0" label="新" />
             <el-option :value="1" label="旧" />
@@ -207,14 +212,21 @@ export default {
         Price: '',
         Tool: '',
         TotalCount: 20,
-        attrList: [],
+        AttrList: [],
         addressList: []
       },
       loading: false,
       options: [],
       catalog1Id: '',
+      valueRule: {
+        Room: [{ required: true, message: '请输入房间号', trigger: 'blur' }],
+        Self: [{ required: true, message: '请输入货架号', trigger: 'blur' }],
+        Status: [{ required: true, message: '请选择新旧状态', trigger: 'blur' }]
+      },
       rule: {
-        Catalog2Id: [{ required: true, message: '请请选择目录', trigger: 'blur' }]
+        Catalog2Id: [{ required: true, message: '请选择目录', trigger: 'blur' }],
+        SpuId: [{ required: true, message: '请选择产品', trigger: 'blur' }],
+        Tool: [{ required: true, message: '请选择产品类型(配件/工具)', trigger: 'blur' }]
       },
       catalogList: [],
       spuList: [],
@@ -234,15 +246,19 @@ export default {
     }
   },
   watch: {
-    checkedAttrs(val) {
-      this.modal.attrList = val.map(_ => {
-        const arr = _.split('@_@')
-        return {
-          AttrName: arr[0],
-          SpuAttrValueId: arr[2],
-          Value: arr[1]
-        }
-      })
+    checkedAttrs: {
+      handler(val) {
+        this.modal.AttrList = val.map(_ => {
+          _ = JSON.parse(_)
+          return {
+            AttrName: _.AttrName,
+            SpuAttrValueId: _.SpuAttrValueId,
+            Value: _.Value
+          }
+        })
+      },
+      immediate: true,
+      deep: true
     },
     totalCount(val) {
       this.modal.TotalCount = val
@@ -298,12 +314,16 @@ export default {
       this.valueTitle = '修改位置'
     },
     addAddr() {
-      if (this.valueTitle === '添加位置') {
-        this.modal.addressList.push(this.value)
-      } else {
-        this.modal.addressList.splice(this.addrIndex, 1, this.value)
-      }
-      this.valueVisible = false
+      this.$refs.valueForm.validate((valid) => {
+        if (valid) {
+          if (this.valueTitle === '添加位置') {
+            this.modal.addressList.push(this.value)
+          } else {
+            this.modal.addressList.splice(this.addrIndex, 1, this.value)
+          }
+          this.valueVisible = false
+        }
+      })
     },
     newAddr() {
       this.valueVisible = true
@@ -324,26 +344,30 @@ export default {
         .catch(() => {})
     },
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addSku(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updSku(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addSku(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updSku(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        }
+      })
     },
     add() {
       this.type = '新增'
@@ -366,7 +390,13 @@ export default {
       this.type = '编辑'
       this.dialogVisible = true
       this.modal = obj
-      this.checkedAttrs = this.modal.attrList.map(_ => _.AttrName + '@_@' + _.Value + '@_@' + _.SpuAttrValueId)
+      this.checkedAttrs = this.modal.AttrList.map(_ => {
+        return JSON.stringify({
+          AttrName: _.AttrName,
+          SpuAttrValueId: _.SpuAttrValueId,
+          Value: _.Value
+        })
+      })
     },
     success() {
       this.$message({

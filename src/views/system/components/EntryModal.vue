@@ -13,12 +13,12 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="操作员">
+          <el-form-item label="操作员" prop="Operator">
             <el-input v-model="modal.Operator" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="批次">
+          <el-form-item label="批次" prop="Batch">
             <el-input-number v-model="modal.Batch" :step="1" />
           </el-form-item>
         </el-col>
@@ -95,7 +95,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="入库时间">
+          <el-form-item label="入库时间" prop="EntryDate">
             <el-date-picker
               v-model="modal.EntryDate"
               type="datetime"
@@ -121,17 +121,15 @@
           :data="modal.entrySkuList"
           style="width: 100%"
         >
-          <el-table-column v-if="modal.IsMaintain !== 1 || !disable" align="left" width="180px" label="操作">
+          <el-table-column v-if="modal.IsMaintain !== 1 || !disable" align="left" width="240px" label="操作">
             <template slot-scope="scope">
               <el-button
                 v-show="!scope.row.disabled "
                 type="danger"
-                size="mini"
                 @click="handleDelete(scope.$index)"
               >删除</el-button>
               <el-button
                 type="primary"
-                size="mini"
                 @click="selectAddr(scope.row)"
               >选择位置</el-button>
             </template>
@@ -145,7 +143,20 @@
             align="center"
           >
             <template slot-scope="scope">
-              {{ scope.row.AddressId === '' ? '未选择' : '已选择' }}
+              <div>
+                <el-tag v-if="scope.row.AddressId === ''" type="warning">未选择</el-tag>
+                <el-tag v-else type="success">已选择</el-tag>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="属性"
+          >
+            <template slot-scope="scope">
+              <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                {{ i.AttrName }}
+                {{ i.Value }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column
@@ -193,7 +204,7 @@
       :append-to-body="true"
       width="40%"
     >
-      <el-form label-width="80px" style="padding: 20px;">
+      <el-form ref="valueForm" label-width="80px" :model="value" style="padding: 20px;" :rules="valueRule">
         <el-form-item v-show="!itemDisable" label="所属一级目录">
           <el-select v-model="catalog1Id" placeholder="请选择" style="width: 100%;">
             <el-option
@@ -214,7 +225,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item v-show="!itemDisable" label="库存">
+        <el-form-item v-show="!itemDisable" label="库存" prop="SkuId">
           <el-select v-model="value.SkuId" placeholder="请选择" style="width: 100%;">
             <el-option
               v-for="item in spuList"
@@ -224,7 +235,13 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="位置">
+        <el-form-item v-show="!itemDisable" label="属性">
+          <el-tag v-for="i in value.AttrList" :key="i.Id">
+            {{ i.AttrName }}
+            {{ i.Value }}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label="位置" prop="AddressId">
           <el-select v-model="value.AddressId" :disabled="itemDisable" placeholder="请选择" style="width: 100%;">
             <el-option
               v-for="item in addrList"
@@ -309,7 +326,8 @@ export default {
         TotalPrice: '',
         OldPartId: '',
         ToolId: '',
-        Status: null
+        Status: null,
+        AttrList: []
       },
       valueVisible: false,
       dialogVisible: false,
@@ -340,7 +358,13 @@ export default {
       catalog1Id: '',
       Catalog2Id: '',
       rule: {
-        Catalog2Id: [{ required: true, message: '请请选择目录', trigger: 'blur' }]
+        Operator: [{ required: true, message: '请输入操作员', trigger: 'blur' }],
+        Batch: [{ required: true, message: '请输入批次', trigger: 'blur' }],
+        EntryDate: [{ required: true, message: '请选择入库时间', trigger: 'blur' }]
+      },
+      valueRule: {
+        SkuId: [{ required: true, message: '请选择库存', trigger: 'blur' }],
+        AddressId: [{ required: true, message: '请选择位置', trigger: 'blur' }]
       },
       catalogList: [],
       spuList: [],
@@ -440,10 +464,12 @@ export default {
       if (index < 0) {
         this.addrList = []
         this.value.SkuName = ''
+        this.value.AttrList = []
         return
       }
-      this.addrList = this.spuList[index].addressList.filter(i => i.Status === 0)
+      this.addrList = this.spuList[index].addressList
       this.value.SkuName = this.spuList[index].SkuName
+      this.value.AttrList = this.spuList[index].AttrList
     },
     'value.AddressId'(val) {
       this.value.Status = ''
@@ -497,12 +523,19 @@ export default {
       })
     },
     addItem() {
-      if (this.valueTitle === '添加入库信息') {
-        this.modal.entrySkuList.push(this.value)
-      } else {
-        this.modal.entrySkuList.splice(this.addrIndex, 1, this.value)
-      }
-      this.valueVisible = false
+      this.$refs.valueForm.validate((valid) => {
+        if (valid) {
+          if (this.valueTitle === '添加入库信息') {
+            this.modal.entrySkuList.push(this.value)
+          } else {
+            this.modal.entrySkuList.splice(this.addrIndex, 1, this.value)
+          }
+          this.valueVisible = false
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     newItem() {
       this.valueVisible = true
@@ -516,7 +549,8 @@ export default {
         TotalPrice: '',
         OldPartId: '',
         ToolId: '',
-        Status: null
+        Status: null,
+        AttrList: []
       }
     },
     handleDelete(index) {
@@ -527,28 +561,35 @@ export default {
         .catch(() => {})
     },
     submit() {
-      this.loading = true
-      const obj = JSON.parse(JSON.stringify(this.modal))
-      obj.entrySkuList = obj.entrySkuList.filter(i => i.AddressId !== '')
-      if (this.type === '新增') {
-        addEntry(obj).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updEntry(obj).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          const obj = JSON.parse(JSON.stringify(this.modal))
+          obj.entrySkuList = obj.entrySkuList.filter(i => i.AddressId !== '')
+          if (this.type === '新增') {
+            addEntry(obj).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updEntry(obj).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     add() {
       this.type = '新增'
@@ -590,7 +631,8 @@ export default {
           TotalPrice: i.TotalCount * i.Price,
           OldPartId: '',
           ToolId: '',
-          Status: i.Status
+          Status: i.Status,
+          AttrList: i.AttrList
         }
       })
     },

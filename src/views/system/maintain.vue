@@ -29,10 +29,9 @@
       />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button
             type="danger"
-            size="mini"
             @click="handleDelete(scope.$index, scope.row)"
           >删除</el-button>
         </template>
@@ -54,6 +53,16 @@
                   prop="Brand"
                   label="品牌"
                 />
+                <el-table-column
+                  label="属性"
+                >
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="Num"
                   label="数量"
@@ -81,6 +90,16 @@
                   prop="Brand"
                   label="品牌"
                 />
+                <el-table-column
+                  label="属性"
+                >
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="TotalCount"
                   label="数量"
@@ -115,6 +134,16 @@
                   prop="Brand"
                   label="品牌"
                 />
+                <el-table-column
+                  label="属性"
+                >
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="Num"
                   label="数量"

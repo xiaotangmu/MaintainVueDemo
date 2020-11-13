@@ -9,13 +9,13 @@
       <el-form-item label="所属公司" prop="CompanyId">
         <el-input v-model="modal.CompanyId" />
       </el-form-item>
-      <el-form-item label="车牌号码">
+      <el-form-item label="车牌号码" prop="CarLicense">
         <el-input v-model="modal.CarLicense" />
       </el-form-item>
-      <el-form-item label="问题描述">
+      <el-form-item label="问题描述" prop="Description">
         <el-input v-model="modal.Description" />
       </el-form-item>
-      <el-form-item label="预约时间">
+      <el-form-item label="预约时间" prop="AppointmentDate">
         <el-date-picker
           v-model="modal.AppointmentDate"
           type="datetime"
@@ -23,16 +23,16 @@
           style="width: 100%;"
         />
       </el-form-item>
-      <el-form-item label="车型">
+      <el-form-item label="车型" prop="Type">
         <el-input v-model="modal.Type" />
       </el-form-item>
-      <el-form-item label="联系人">
+      <el-form-item label="联系人" prop="Contact">
         <el-input v-model="modal.Contact" />
       </el-form-item>
-      <el-form-item label="联系电话">
+      <el-form-item label="联系电话" prop="Phone">
         <el-input v-model="modal.Phone" />
       </el-form-item>
-      <el-form-item label="状态">
+      <el-form-item label="状态" prop="Status">
         <el-select v-model="modal.Status" style="width: 100%;">
           <el-option :value="0" label="未处理" />
           <el-option :value="1" label="已处理" />
@@ -65,11 +65,19 @@ export default {
         Type: '',
         Contact: '',
         Phone: '',
-        Status: ''
+        Status: '',
+        Remark: ''
       },
       loading: false,
       rule: {
-        CompanyId: [{ required: true, message: '请选择公司', trigger: 'blur' }]
+        CompanyId: [{ required: true, message: '请选择公司', trigger: 'blur' }],
+        CarLicense: [{ required: true, message: '请输入车牌号', trigger: 'blur' }],
+        Description: [{ required: true, message: '请输入问题描述', trigger: 'blur' }],
+        AppointmentDate: [{ required: true, message: '请选择预约时间', trigger: 'blur' }],
+        Type: [{ required: true, message: '请输入车型', trigger: 'blur' }],
+        Contact: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
+        Phone: [{ required: true, message: '请输入联系电话', trigger: 'blur' }],
+        Status: [{ required: true, message: '请输入选择状态', trigger: 'blur' }]
       }
     }
   },
@@ -81,26 +89,33 @@ export default {
   watch: {},
   methods: {
     submit() {
-      this.loading = true
-      if (this.type === '新增') {
-        addAppointment(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      } else {
-        updAppointment(this.modal).then(() => {
-          this.success()
-          this.$emit('handleSuccess')
-          this.loading = false
-          this.dialogVisible = false
-        }).catch(() => {
-          this.loading = false
-        })
-      }
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.loading = true
+          if (this.type === '新增') {
+            addAppointment(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          } else {
+            updAppointment(this.modal).then(() => {
+              this.success()
+              this.$emit('handleSuccess')
+              this.loading = false
+              this.dialogVisible = false
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     add() {
       this.type = '新增'
