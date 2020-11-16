@@ -74,6 +74,7 @@
               disabled
               type="datetime"
               placeholder="选择日期时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
               style="width: 100%;"
             />
           </el-form-item>
@@ -85,6 +86,7 @@
               disabled
               type="datetime"
               placeholder="选择日期时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
               style="width: 100%;"
             />
           </el-form-item>
@@ -100,6 +102,7 @@
               v-model="modal.EntryDate"
               type="datetime"
               placeholder="选择日期时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
               style="width: 100%;"
               :picker-options="pickerOptions"
             />
@@ -170,6 +173,7 @@
           >
             <template slot-scope="scope">
               <el-input-number v-model="scope.row.Quantity" :disabled="modal.IsMaintain === 1 && disable" :step="1" :max="scope.row.maxNum" />
+              {{ '(' + scope.row.Unit + ')' }}
             </template>
           </el-table-column>
           <el-table-column

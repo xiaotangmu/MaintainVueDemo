@@ -37,6 +37,7 @@
             v-model="modal.OutDate"
             type="datetime"
             placeholder="选择日期时间"
+            value-format="yyyy-MM-dd HH:mm:ss"
             style="width: 100%;"
             :picker-options="pickerOptions"
           />
@@ -85,9 +86,12 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="Quantity"
             label="数量"
-          />
+          >
+            <template slot-scope="scope">
+              {{ scope.row.Quantity + '(' + scope.row.Unit + ')' }}
+            </template>
+          </el-table-column>
           <el-table-column
             label="总金额"
           >
@@ -177,7 +181,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="数量">
+        <el-form-item :label="'数量' + (value.Unit? ('(' + value.Unit + ')') : '')">
           <el-input-number v-model="value.Quantity" style="width: 300px;" :step="1" :max="maxCount" />
         </el-form-item>
         <el-form-item label="单价">
@@ -228,6 +232,7 @@ export default {
         Price: '',
         AddressId: '',
         TotalPrice: '',
+        Unit: '',
         Tool: '',
         Status: '',
         AttrList: []
@@ -320,12 +325,14 @@ export default {
         this.addrList = []
         this.value.Tool = ''
         this.value.SkuName = ''
+        this.value.Unit = ''
         this.value.AttrList = []
         return
       }
       this.addrList = this.spuList[index].addressList
       this.value.Tool = this.spuList[index].Tool
       this.value.SkuName = this.spuList[index].SkuName
+      this.value.Unit = this.spuList[index].Unit
       this.value.AttrList = this.spuList[index].AttrList
     },
     'value.AddressId'(val) {
@@ -368,6 +375,7 @@ export default {
       this.valueVisible = true
       this.valueTitle = '添加出库信息'
       this.value = {
+        Unit: '',
         SkuName: '',
         SkuId: '',
         Quantity: '',
@@ -441,6 +449,7 @@ export default {
           AddressId: i.AddressId,
           TotalPrice: i.TotalCount * i.Price,
           Tool: i.Tool,
+          Unit: i.Unit,
           Status: 0,
           AttrList: i.AttrList
         }

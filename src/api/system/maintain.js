@@ -50,6 +50,13 @@ export function updPart(data) {
     data
   })
 }
+export function updByOut(data) {
+  return request({
+    url: url + '/Maintain/UpdateWithOut',
+    method: 'post',
+    data
+  })
+}
 export function delMaintain(data) {
   return request({
     url: url + '/Maintain/Delete',

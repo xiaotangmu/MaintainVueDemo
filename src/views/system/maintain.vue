@@ -5,12 +5,14 @@
       v-model="search.StartTime"
       type="datetime"
       placeholder="选择开始时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-date-picker
       v-model="search.EndTime"
       type="datetime"
       placeholder="选择结束时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-select v-model="search.Status" style="width: 150px;">
@@ -57,16 +59,19 @@
                   label="属性"
                 >
                   <template slot-scope="scope">
-                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
                       {{ i.AttrName }}
                       {{ i.Value }}
                     </el-tag>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  prop="Num"
                   label="数量"
-                />
+                >
+                  <template slot-scope="scope">
+                    {{ scope.row.Num + '(' + scope.row.Unit + ')' }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="DealNum"
                   label="处理数量"
@@ -94,16 +99,19 @@
                   label="属性"
                 >
                   <template slot-scope="scope">
-                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
                       {{ i.AttrName }}
                       {{ i.Value }}
                     </el-tag>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  prop="TotalCount"
                   label="数量"
-                />
+                >
+                  <template slot-scope="scope">
+                    {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="DealNum"
                   label="处理数量"
@@ -138,16 +146,19 @@
                   label="属性"
                 >
                   <template slot-scope="scope">
-                    <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
                       {{ i.AttrName }}
                       {{ i.Value }}
                     </el-tag>
                   </template>
                 </el-table-column>
                 <el-table-column
-                  prop="Num"
                   label="数量"
-                />
+                >
+                  <template slot-scope="scope">
+                    {{ scope.row.Num + '(' + scope.row.Unit + ')' }}
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="DealNum"
                   label="归还数量"

@@ -45,9 +45,12 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="TotalCount"
               label="数量"
-            />
+            >
+              <template slot-scope="scope">
+                {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
+              </template>
+            </el-table-column>
             <el-table-column
               label="单价"
             >

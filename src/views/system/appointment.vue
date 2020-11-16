@@ -5,12 +5,14 @@
       v-model="search.StartTime"
       type="datetime"
       placeholder="选择开始时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-date-picker
       v-model="search.EndTime"
       type="datetime"
       placeholder="选择结束时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-select v-model="search.Status" style="width: 150px;">

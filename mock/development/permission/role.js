@@ -2,22 +2,26 @@ const Mock = require('mockjs')
 
 const routes = [{
   path: '/permission',
-  component: 'Layout',
-  redirect: '/permission/authority',
-  hidden: false,
-  name: 'Permission',
   meta: { title: '权限管理', icon: 'lock' },
   children: [
     {
       path: 'authority',
-      component: 'permission_authority',
-      name: 'Authority',
-      meta: { title: '菜单管理', icon: '' }
+      meta: { title: '菜单管理', icon: '' },
+      permission: [
+        {
+          isPermission: true,
+          permission: '007',
+          title: '权限007'
+        },
+        {
+          isPermission: true,
+          permission: '008',
+          title: '权限008'
+        }
+      ]
     },
     {
       path: 'role',
-      component: 'permission_role',
-      name: 'Role',
       meta: { title: '角色管理', icon: '' }
     }
   ]

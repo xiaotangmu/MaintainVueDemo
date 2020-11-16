@@ -10,7 +10,14 @@ const routes = [{
       path: 'authority',
       component: 'permission_authority',
       name: 'Authority',
-      meta: { title: '菜单管理', icon: '' }
+      meta: { title: '菜单管理', icon: '' },
+      permission: [
+        {
+          isPermission: true,
+          permission: '007',
+          title: '权限007'
+        }
+      ]
     },
     {
       path: 'role',

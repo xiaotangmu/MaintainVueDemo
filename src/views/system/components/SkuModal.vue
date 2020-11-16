@@ -53,12 +53,17 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="警报值">
-            <el-input v-model="modal.Alarm" />
+            <el-input-number v-model="modal.Alarm" :step="1" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="品牌">
             <el-input v-model="modal.Brand" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="单位">
+            <el-input v-model="modal.Unit" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -85,7 +90,7 @@
           <el-collapse-item title="属性" name="1">
             <div v-for="i in attrList" :key="i.AttrName">
               {{ i.AttrName }}:
-              <el-checkbox-group v-model="checkedAttrs">
+              <el-checkbox-group v-model="checkedAttrs" @change="bindCheckBox">
                 <el-checkbox
                   v-for="j in i.ValueList"
                   :key="j.Value"
@@ -210,6 +215,7 @@ export default {
         Alarm: '',
         Brand: '',
         Price: '',
+        Unit: '',
         Tool: '',
         TotalCount: 20,
         AttrList: [],
@@ -246,20 +252,6 @@ export default {
     }
   },
   watch: {
-    checkedAttrs: {
-      handler(val) {
-        this.modal.AttrList = val.map(_ => {
-          _ = JSON.parse(_)
-          return {
-            AttrName: _.AttrName,
-            SpuAttrValueId: _.SpuAttrValueId,
-            Value: _.Value
-          }
-        })
-      },
-      immediate: true,
-      deep: true
-    },
     totalCount(val) {
       this.modal.TotalCount = val
     },
@@ -307,6 +299,22 @@ export default {
     })
   },
   methods: {
+    bindCheckBox(val) {
+      this.modal.AttrList = val.map(_ => {
+        _ = JSON.parse(_)
+        return {
+          AttrName: _.AttrName,
+          SpuAttrValueId: _.SpuAttrValueId,
+          Value: _.Value
+        }
+      })
+      const arr = {}
+      this.modal.AttrList.forEach(i => {
+        arr[i.AttrName] = i
+      })
+      this.modal.AttrList = Object.values(arr)
+      this.checkedAttrs = this.modal.AttrList.map(i => JSON.stringify(i))
+    },
     handleEdit(index, row) {
       this.addrIndex = index
       this.value = row
@@ -381,6 +389,7 @@ export default {
         Brand: '',
         Price: '',
         Tool: '',
+        Unit: '',
         attrList: [],
         addressList: []
       }

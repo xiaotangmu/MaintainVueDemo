@@ -108,27 +108,32 @@ export default {
       const res = await getRoles()
       this.rolesList = res.data
     },
-
     generateRoutes(routes, basePath = '/') {
       const res = []
-
       for (let route of routes) {
-        if (route.hidden) { continue }
-
-        const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
-
-        if (route.children && onlyOneShowingChild && !route.alwaysShow) {
-          route = onlyOneShowingChild
-        }
-
-        const data = {
-          path: path.resolve(basePath, route.path),
-          title: route.meta && route.meta.title
-
-        }
-
-        if (route.children) {
-          data.children = this.generateRoutes(route.children, data.path)
+        let data = {}
+        if (route.isPermission) {
+          data = {
+            permission: route.permission,
+            title: route.title
+          }
+        } else {
+          if (route.hidden) { continue }
+          const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
+          if (route.children && onlyOneShowingChild && !route.alwaysShow) {
+            route = onlyOneShowingChild
+          }
+          data = {
+            path: path.resolve(basePath, route.path),
+            title: route.meta && route.meta.title
+          }
+          if (route.permission && route.permission.length > 0) {
+            data.children = this.generateRoutes(route.permission, data.path)
+          } else {
+            if (route.children) {
+              data.children = this.generateRoutes(route.children, data.path)
+            }
+          }
         }
         res.push(data)
       }
@@ -138,10 +143,14 @@ export default {
       let data = []
       routes.forEach(route => {
         data.push(route)
-        if (route.children) {
-          const temp = this.generateArr(route.children)
-          if (temp.length > 0) {
-            data = [...data, ...temp]
+        if (route.permission && route.permission.length > 0) {
+          data = [...data, ...route.permission]
+        } else {
+          if (route.children) {
+            const temp = this.generateArr(route.children)
+            if (temp.length > 0) {
+              data = [...data, ...temp]
+            }
           }
         }
       })
@@ -162,6 +171,8 @@ export default {
       this.role = deepClone(scope.row)
       this.$nextTick(() => {
         const routes = this.generateRoutes(this.role.routes)
+        console.log(this.generateRoutes(this.role.routes))
+        console.log(this.generateArr(routes))
         this.$refs.tree.setCheckedNodes(this.generateArr(routes))
         this.checkStrictly = false
       })
@@ -200,10 +211,8 @@ export default {
     },
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
-
       const checkedKeys = this.$refs.tree.getCheckedKeys()
       this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
-
       if (isEdit) {
         await updateRole(this.role.key, this.role)
         for (let index = 0; index < this.rolesList.length; index++) {
@@ -240,7 +249,6 @@ export default {
         onlyOneChild.path = path.resolve(parent.path, onlyOneChild.path)
         return onlyOneChild
       }
-
       if (showingChildren.length === 0) {
         onlyOneChild = { ... parent, path: '', noShowingChildren: true }
         return onlyOneChild

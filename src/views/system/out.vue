@@ -5,12 +5,14 @@
       v-model="search.StartTime"
       type="datetime"
       placeholder="选择开始时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-date-picker
       v-model="search.EndTime"
       type="datetime"
       placeholder="选择结束时间"
+      value-format="yyyy-MM-dd HH:mm:ss"
       style="width: 300px;"
     />
     <el-button type="primary" icon="el-icon-plus" @click="getList()">查询</el-button>
@@ -79,9 +81,12 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="TotalCount"
               label="数量"
-            />
+            >
+              <template slot-scope="scope">
+                {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
+              </template>
+            </el-table-column>
             <el-table-column
               label="总金额"
             >

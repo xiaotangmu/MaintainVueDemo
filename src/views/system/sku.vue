@@ -142,6 +142,7 @@ export default {
         { label: '品牌', model: 'Brand' },
         { label: '金额', model: 'Price' },
         { label: '数量', model: 'TotalCount' },
+        { label: '单位', model: 'Unit' },
         { label: '属性', model: 'AttrList' },
         { label: '配件/工具', model: 'Tool' }
       ],
