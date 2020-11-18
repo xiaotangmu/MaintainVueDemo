@@ -1,4 +1,4 @@
-
+const Mock = require('mockjs')
 const tokens = {
   admin: {
     token: 'admin-token'
@@ -111,14 +111,14 @@ const users = {
     introduction: 'I am a super administrator',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Super Admin',
-    role: '超管'
+    role: ['admin']
   },
   'editor-token': {
     routes: [],
     introduction: 'I am an editor',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     name: 'Normal Editor',
-    role: '普通'
+    role: ['editor']
   }
 }
 
@@ -177,6 +177,51 @@ module.exports = [
       return {
         code: 20000,
         data: 'success'
+      }
+    }
+  },
+
+  {
+    url: '/vue-element-admin/users',
+    type: 'get',
+    response: _ => {
+      return {
+        code: 20000,
+        data: users
+      }
+    }
+  },
+
+  // add user
+  {
+    url: '/vue-element-admin/user',
+    type: 'post',
+    response: {
+      code: 20000,
+      data: {
+        key: Mock.mock('@integer(300, 5000)')
+      }
+    }
+  },
+
+  // update user
+  {
+    url: '/vue-element-admin/user/[A-Za-z0-9]',
+    type: 'put',
+    response: {
+      code: 20000,
+      message: 'success'
+    }
+  },
+
+  // delete user
+  {
+    url: '/vue-element-admin/user/[A-Za-z0-9]',
+    type: 'delete',
+    response: {
+      code: 20000,
+      data: {
+        status: 'success'
       }
     }
   }

@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-button type="primary" @click="handleAddUser">新增</el-button>
 
-    <el-table :data="rolesList" style="width: 100%;margin-top:30px;" stripe>
+    <el-table :data="usersList" style="width: 100%;margin-top:30px;" stripe>
       <el-table-column align="center" label="用户编号" width="220">
         <template slot-scope="scope">
           {{ scope.row.key }}
@@ -15,12 +15,12 @@
       </el-table-column>
       <el-table-column align="header-center" label="备注">
         <template slot-scope="scope">
-          {{ scope.row.description }}
+          {{ scope.row.introduction }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="角色">
         <template slot-scope="scope">
-          {{ scope.row.role }}
+          <el-tag v-for="i in scope.row.role" :key="i">{{ i }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -38,11 +38,21 @@
         </el-form-item>
         <el-form-item label="备注">
           <el-input
-            v-model="user.description"
+            v-model="user.introduction"
             :autosize="{ minRows: 4, maxRows: 8}"
             type="textarea"
-            placeholder="角色"
+            placeholder="备注"
           />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="user.role" style="width: 100%;" multiple placeholder="请选择">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.key"
+              :label="item.name"
+              :value="item.key"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -59,8 +69,8 @@ import { getUsers, addUser, deleteUser, updateUser } from '@/api/user'
 import { getRoles } from '@/api/permission/role'
 const defaultUser = {
   key: '',
+  introduction: '',
   name: '',
-  description: '',
   role: []
 }
 
@@ -81,6 +91,7 @@ export default {
   },
   created() {
     this.getRoles()
+    this.getUsers()
   },
   methods: {
     async getRoles() {
@@ -89,7 +100,12 @@ export default {
     },
     async getUsers() {
       const res = await getUsers()
-      this.usersList = res.data
+      const users = res.data
+      this.usersList = Object.keys(users).map(_ => {
+        const obj = JSON.parse(JSON.stringify(users[_]))
+        obj.key = _
+        return obj
+      })
     },
     handleAddUser() {
       this.user = Object.assign({}, defaultUser)
