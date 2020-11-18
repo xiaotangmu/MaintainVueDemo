@@ -8,11 +8,11 @@
       <el-form-item label="菜单名称" prop="name">
         <el-input v-model="menu.name" :disabled="disable" />
       </el-form-item>
-      <el-form-item label="父级菜单名称" prop="parent">
+      <el-form-item label="父级菜单名称" prop="pid">
         <TreeSelect
           :props="props"
           :options="parentOpt"
-          :value="menu.parent"
+          :value="menu.pid"
           :clearable="isClearable"
           :accordion="isAccordion"
           style="width: 100%;"
@@ -20,7 +20,7 @@
         />
       </el-form-item>
       <el-form-item label="路径" prop="path">
-        <el-input v-model="menu.path" />
+        <el-input v-model="menu.path" @change="validatePath" />
       </el-form-item>
       <el-form-item label="组件名" prop="component">
         <el-input v-model="menu.component" />
@@ -49,13 +49,15 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      <el-button type="primary" @click="submit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
-import { getRoutes } from '@/api/permission/authority'
+import { deepClone } from '@/utils'
+import { addMenu, updMenu } from '@/api/permission/menu'
+import { getRoutes } from '@/api/permission/menu'
 import TreeSelect from '@/components/TreeSelect'
 export default {
   components: { TreeSelect },
@@ -63,9 +65,9 @@ export default {
     return {
       dialogVisible: false,
       type: '',
-      parentOpt: [{ name: 'Root' }],
+      parentOpt: [{ id: 'Root', name: 'Root' }],
       props: {
-        value: 'name',
+        value: 'id',
         label: 'name',
         children: 'children'
         // disabled:true
@@ -73,8 +75,9 @@ export default {
       isClearable: true, // 可清空（可选）
       isAccordion: true, // 可收起（可选）
       menu: {
+        id: '',
         name: '',
-        parent: '',
+        pid: '',
         path: '',
         component: '',
         meta: {
@@ -86,7 +89,7 @@ export default {
         hidden: ''
       },
       rules: {
-        parent: [{ required: true, message: '请输入父级菜单名称', trigger: 'blur' }],
+        pid: [{ required: true, message: '请输入父级菜单名称', trigger: 'blur' }],
         path: [{ required: true, message: '请输入路径', trigger: 'blur' }],
         component: [{ required: true, message: '请输入组件名称', trigger: 'blur' }]
       }
@@ -97,19 +100,46 @@ export default {
       return this.type === '编辑'
     }
   },
+  watch: {
+    'menu.pid'(val) {
+      if (val === 'Root') {
+        if (this.menu.path && this.menu.path.charAt(0) !== '/') {
+          this.menu.path = '/' + this.menu.path
+        }
+      } else {
+        if (this.menu.path.charAt(0) === '/') {
+          this.menu.path = this.menu.path.replace(/^\/+/, '')
+        }
+      }
+    }
+  },
   created() {
     getRoutes().then(res => {
       this.parentOpt = this.parentOpt.concat(res.data)
     })
   },
   methods: {
+    validatePath(val) {
+      if (this.menu.pid === 'Root') {
+        if (val && val.charAt(0) !== '/') {
+          this.menu.path = '/' + val
+        } else {
+          this.menu.path = this.menu.path.replace(/^\/+/, '/')
+        }
+      } else {
+        if (val.charAt(0) === '/') {
+          this.menu.path = this.menu.path.replace(/^\/+/, '')
+        }
+      }
+    },
     getValue(value) {
-      this.menu.parent = value
+      this.menu.pid = value
     },
     add() {
       this.type = '新增'
       this.dialogVisible = true
-      this.menu.parent = 'Root'
+      this.menu.pid = 'Root'
+      this.menu.id = ''
       this.menu.name = ''
       this.menu.path = ''
       this.menu.component = ''
@@ -119,10 +149,11 @@ export default {
       this.menu.redirect = ''
       this.menu.hidden = false
     },
-    edit(row, parent) {
+    edit(row, pid) {
       this.type = '编辑'
       this.dialogVisible = true
-      this.menu.parent = parent || 'Root'
+      this.menu.pid = pid || 'Root'
+      this.menu.id = row.id || ''
       this.menu.name = row.name || ''
       this.menu.path = row.path || ''
       this.menu.component = row.component || ''
@@ -131,6 +162,30 @@ export default {
       this.menu.meta.noCatch = row.meta.noCatch || true
       this.menu.redirect = row.redirect || ''
       this.menu.hidden = row.hidden || false
+    },
+    submit() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          if (this.type === '编辑') {
+            this.updMenu(this.menu)
+          } else {
+            this.addMenu(this.menu)
+          }
+        }
+      })
+    },
+    async addMenu(row) {
+      const { data } = await addMenu(row)
+      const obj = deepClone(row)
+      this.dialogVisible = false
+      obj.id = data
+      this.$emit('handleAdd', 'id', row.pid, obj)
+    },
+    async updMenu(row) {
+      await updMenu(row)
+      this.dialogVisible = false
+      const obj = deepClone(row)
+      this.$emit('handleUpd', 'id', row.id, obj)
     }
   }
 }

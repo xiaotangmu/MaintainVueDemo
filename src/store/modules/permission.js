@@ -37,7 +37,7 @@ const actions = {
     return new Promise(resolve => {
       const asyncRoutes = getRouter(routes)
       // const accessedRoutes = exampleRoutes.concat(asyncRoutes) || []
-      const accessedRoutes = [].concat(asyncRoutes) || []
+      const accessedRoutes = asyncRoutes || []
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

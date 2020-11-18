@@ -37,7 +37,7 @@
             v-model="modal.OutDate"
             type="datetime"
             placeholder="选择日期时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            format="yyyy-MM-dd HH:mm:ss"
             style="width: 100%;"
             :picker-options="pickerOptions"
           />

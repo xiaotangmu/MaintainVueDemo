@@ -11,15 +11,15 @@ const tokens = {
 const routes = [{
   path: '/permission',
   component: 'Layout',
-  redirect: '/permission/authority',
+  redirect: '/permission/menu',
   hidden: false,
   name: 'Permission',
   meta: { title: '权限管理', icon: 'lock' },
   children: [
     {
-      path: 'authority',
-      component: 'permission_authority',
-      name: 'Authority',
+      path: 'menu',
+      component: 'permission_menu',
+      name: 'Menu',
       meta: { title: '菜单管理', icon: '' }
     },
     {

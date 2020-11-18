@@ -1,26 +1,29 @@
 const Mock = require('mockjs')
 
 const routes = [{
+  id: '0',
   path: '/permission',
   meta: { title: '权限管理', icon: 'lock' },
   children: [
     {
+      id: '1',
       path: 'authority',
       meta: { title: '菜单管理', icon: '' },
-      permission: [
+      permissionList: [
         {
-          isPermission: true,
+          id: '1-0',
           permission: '007',
           title: '权限007'
         },
         {
-          isPermission: true,
+          id: '1-1',
           permission: '008',
           title: '权限008'
         }
       ]
     },
     {
+      id: '2',
       path: 'role',
       meta: { title: '角色管理', icon: '' }
     }
@@ -100,10 +103,8 @@ module.exports = [
     url: '/vue-element-admin/role/[A-Za-z0-9]',
     type: 'put',
     response: {
-      code: 20000,
-      data: {
-        status: 'success'
-      }
+      code: 1,
+      message: 'error'
     }
   },
 

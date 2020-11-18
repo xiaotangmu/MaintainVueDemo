@@ -1,28 +1,17 @@
 export function formatDate(date, format = 'yyyy-MM-dd') {
-  const yyyy = date.getFullYear()
+  date = new Date(date)
+  const obj = {
+    'yyyy': date.getFullYear(),
+    'MM': date.getMonth() + 1,
+    'dd': date.getDate(),
+    'hh': date.getHours(),
+    'mm': date.getMinutes(),
+    'ss': date.getSeconds()
+  }
 
-  let mm = date.getMonth() + 1
-  mm = mm < 10 ? '0' + mm : mm
-
-  let dd = date.getDate()
-  dd = dd < 10 ? '0' + dd : dd
-
-  let hh = date.getHours()
-  hh = hh < 10 ? '0' + hh : hh
-
-  let minu = date.getMinutes()
-  minu = minu < 10 ? '0' + minu : minu
-
-  let ss = date.getSeconds()
-  ss = ss < 10 ? '0' + ss : ss
-
-  return format
-    .replace('yyyy', yyyy)
-    .replace('MM', mm)
-    .replace('dd', dd)
-    .replace('hh', hh)
-    .replace('mm', minu)
-    .replace('ss', ss)
+  return format.replace(/[yMdhms]+/g, (key) => {
+    return obj[key].toString().padStart(2, '0')
+  })
 }
 
 export function delEmpty(obj) {
@@ -43,18 +32,21 @@ export function delByKey(arr, key, value) {
   })
 }
 
-export function getParentByName(name, arr, parentName) {
-  var pName = parentName || 'Root'
-  arr.forEach(i => {
-    if (i.name === name) {
-      return pName
-    } else {
-      if (i.children) {
-        pName = getParentByName(name, i.children, i.name)
+export function getParentById(id, arr, parentId = 'Root') {
+  let pId = 'Root'
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === id) {
+      return parentId
+    }
+
+    if (arr[i].children) {
+      pId = getParentById(id, arr[i].children, arr[i].id)
+      if (pId !== 'Root') {
+        return pId
       }
     }
-  })
-  return pName
+  }
+  return pId
 }
 export function toMoney(num) {
   if (num) {
@@ -76,5 +68,106 @@ export function toMoney(num) {
     return num // 返回的是字符串23,245.12保留2位小数
   } else {
     return null
+  }
+}
+
+// 生成树
+export function getTreeData(arr, pid) {
+  pid = pid || ''
+  let target = []
+  target = arr.filter(i => {
+    i.pid === pid
+  })
+  const filterArr = arr.filter(i => {
+    i.pid !== pid
+  })
+  target = target.map(i => {
+    i.children = getTreeData(filterArr, i.id)
+    return i
+  })
+  return target
+}
+
+export function delObjByKey(arr, key, value) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i][key] === value) {
+      arr.splice(i, 1)
+      return {
+        isOver: true,
+        arr
+      }
+    } else {
+      if (arr[i].children) {
+        const item = delObjByKey(arr[i].children, key, value)
+        arr[i].children = item.arr
+        if (item.isOver) {
+          return {
+            isOver: true,
+            arr
+          }
+        }
+      }
+    }
+  }
+  return {
+    isOver: false,
+    arr
+  }
+}
+
+export function addObjByKey(arr, key, value, obj) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i][key] === value) {
+      arr[i].children = arr[i].children || []
+      arr[i].children.push(obj)
+      return {
+        isOver: true,
+        arr
+      }
+    } else {
+      if (arr[i].children) {
+        const item = addObjByKey(arr[i].children, key, value, obj)
+        arr[i].children = item.arr
+        if (item.isOver) {
+          return {
+            isOver: true,
+            arr
+          }
+        }
+      }
+    }
+  }
+  return {
+    isOver: false,
+    arr
+  }
+}
+
+export function updObjByKey(arr, key, value, obj) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i][key] === value) {
+      Object.keys(obj).forEach(_ => {
+        arr[i][_] = obj[_]
+      })
+      return {
+        isOver: true,
+        arr
+      }
+    } else {
+      if (arr[i].children) {
+        const item = updObjByKey(arr[i].children, key, value, obj)
+        arr[i].children = item.arr
+        if (item.isOver) {
+          return {
+            isOver: true,
+            arr
+          }
+        }
+      }
+    }
+  }
+  return {
+    isOver: false,
+    arr
   }
 }

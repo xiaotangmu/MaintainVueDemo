@@ -35,7 +35,7 @@
                   v-model="modal.StartDate"
                   type="datetime"
                   placeholder="选择日期时间"
-                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd HH:mm:ss"
                   style="width: 100%;"
                   :picker-options="pickerOptions"
                 />
@@ -47,7 +47,7 @@
                   v-model="modal.ReturnDate"
                   type="datetime"
                   placeholder="选择日期时间"
-                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd HH:mm:ss"
                   style="width: 100%;"
                 />
               </el-form-item>

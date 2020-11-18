@@ -54,14 +54,15 @@
         </template>
       </el-table-column>
     </el-table>
-    <menu-modal ref="menuModal" @handleSuccess="opeModal" />
+    <menu-modal ref="menuModal" @handleAdd="handleAdd" @handleUpd="handleUpd" />
   </div>
 </template>
 
 <script>
-import { getRoutes } from '@/api/permission/authority'
+import { getRoutes, delMenu } from '@/api/permission/menu'
 import MenuModal from './components/MenuModal'
-import { getParentByName } from '@/utils/utils'
+import { getParentById } from '@/utils/utils'
+import { delEmpty, delObjByKey, addObjByKey } from '@/utils/utils'
 export default {
   components: {
     MenuModal
@@ -77,29 +78,60 @@ export default {
     this.getList()
   },
   methods: {
+    handleAdd(key, value, obj) {
+      if (value === 'Root') {
+        this.tableData.push(obj)
+      } else {
+        addObjByKey(this.tableData, 'id', value, obj)
+      }
+      const arr = JSON.parse(JSON.stringify(this.tableData))
+      this.tableData = arr
+      this.success()
+    },
+    handleUpd(key, value, obj) {
+      delObjByKey(this.tableData, 'id', obj.id)
+      if (obj.pid === 'Root') {
+        this.tableData.push(obj)
+      } else {
+        addObjByKey(this.tableData, 'id', obj.pid, obj)
+      }
+      this.success()
+    },
     menuDelete(index, row) {
       this.$confirm(`确认删除${row.meta.title}?`)
         .then(_ => {
-          this.getList()
+          this.delMenu(row)
         })
         .catch(_ => {})
+    },
+    async delMenu(row) {
+      await delMenu({ id: row.id })
+      delObjByKey(this.tableData, 'id', row.id)
+      this.success()
     },
     menuAdd() {
       this.$refs.menuModal.add()
     },
     menuEdit(index, row) {
-      this.$refs.menuModal.edit(row, getParentByName(row.name, this.tableData))
+      const pid = row.pid || getParentById(row.id, this.tableData)
+      this.$refs.menuModal.edit(row, pid)
     },
     opeModal() {
       this.getList()
     },
     getList() {
       this.loading = true
-      getRoutes({ name: this.search }).then(res => {
+      getRoutes(delEmpty({ name: this.search })).then(res => {
         this.tableData = res.data
         this.loading = false
       }).catch(() => {
         this.loading = false
+      })
+    },
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
       })
     }
   }

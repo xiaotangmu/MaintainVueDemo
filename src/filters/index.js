@@ -92,28 +92,16 @@ export function toMoney(num) {
 
 export function formatDate(date, format = 'yyyy-MM-dd') {
   date = new Date(date)
-  const yyyy = date.getFullYear()
+  const obj = {
+    'yyyy': date.getFullYear(),
+    'MM': date.getMonth() + 1,
+    'dd': date.getDate(),
+    'hh': date.getHours(),
+    'mm': date.getMinutes(),
+    'ss': date.getSeconds()
+  }
 
-  let mm = date.getMonth() + 1
-  mm = mm < 10 ? '0' + mm : mm
-
-  let dd = date.getDate()
-  dd = dd < 10 ? '0' + dd : dd
-
-  let hh = date.getHours()
-  hh = hh < 10 ? '0' + hh : hh
-
-  let minu = date.getMinutes()
-  minu = minu < 10 ? '0' + minu : minu
-
-  let ss = date.getSeconds()
-  ss = ss < 10 ? '0' + ss : ss
-
-  return format
-    .replace('yyyy', yyyy)
-    .replace('MM', mm)
-    .replace('dd', dd)
-    .replace('hh', hh)
-    .replace('mm', minu)
-    .replace('ss', ss)
+  return format.replace(/[yMdhms]+/g, (key) => {
+    return obj[key].toString().padStart(2, '0')
+  })
 }

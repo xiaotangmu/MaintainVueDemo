@@ -32,7 +32,7 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑用户':'新增用户'">
-      <el-form :model="user" :rules="rules" label-width="80px" label-position="left">
+      <el-form ref="ruleForm" :model="user" :rules="rules" label-width="80px">
         <el-form-item label="用户名称" prop="name">
           <el-input v-model="user.name" placeholder="角色名称" />
         </el-form-item>
@@ -47,7 +47,7 @@
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
-        <el-button type="primary" @click="confirmUser">提交</el-button>
+        <el-button type="primary" @click="submit">提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -56,7 +56,7 @@
 <script>
 import { deepClone } from '@/utils'
 import { getUsers, addUser, deleteUser, updateUser } from '@/api/user'
-import { getRoles } from '@/api/role'
+import { getRoles } from '@/api/permission/role'
 const defaultUser = {
   key: '',
   name: '',
@@ -117,6 +117,13 @@ export default {
           })
         })
         .catch(err => { console.error(err) })
+    },
+    submit() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.confirmUser()
+        }
+      })
     },
     async confirmUser() {
       const isEdit = this.dialogType === 'edit'

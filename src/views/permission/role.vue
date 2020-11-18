@@ -27,7 +27,7 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新增角色'">
-      <el-form :model="role" :rules="rules" label-width="80px" label-position="left">
+      <el-form ref="ruleForm" :model="role" :rules="rules" label-width="80px">
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="role.name" placeholder="角色名称" />
         </el-form-item>
@@ -46,14 +46,14 @@
             :data="routesData"
             :props="defaultProps"
             show-checkbox
-            node-key="path"
+            node-key="id"
             class="permission-tree"
           />
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible=false">取消</el-button>
-        <el-button type="primary" @click="confirmRole">提交</el-button>
+        <el-button type="primary" @click="submit">提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -62,7 +62,7 @@
 <script>
 import path from 'path'
 import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
+import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/permission/role'
 
 const defaultRole = {
   key: '',
@@ -99,6 +99,13 @@ export default {
     this.getRoles()
   },
   methods: {
+    submit() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.confirmRole()
+        }
+      })
+    },
     async getRoutes() {
       const res = await getRoutes()
       this.serviceRoutes = res.data
@@ -112,8 +119,9 @@ export default {
       const res = []
       for (let route of routes) {
         let data = {}
-        if (route.isPermission) {
+        if (route.permission) {
           data = {
+            id: route.id,
             permission: route.permission,
             title: route.title
           }
@@ -124,11 +132,12 @@ export default {
             route = onlyOneShowingChild
           }
           data = {
+            id: route.id,
             path: path.resolve(basePath, route.path),
             title: route.meta && route.meta.title
           }
-          if (route.permission && route.permission.length > 0) {
-            data.children = this.generateRoutes(route.permission, data.path)
+          if (route.permissionList && route.permissionList.length > 0) {
+            data.children = this.generateRoutes(route.permissionList, data.path)
           } else {
             if (route.children) {
               data.children = this.generateRoutes(route.children, data.path)
@@ -143,14 +152,10 @@ export default {
       let data = []
       routes.forEach(route => {
         data.push(route)
-        if (route.permission && route.permission.length > 0) {
-          data = [...data, ...route.permission]
-        } else {
-          if (route.children) {
-            const temp = this.generateArr(route.children)
-            if (temp.length > 0) {
-              data = [...data, ...temp]
-            }
+        if (route.children) {
+          const temp = this.generateArr(route.children)
+          if (temp.length > 0) {
+            data = [...data, ...temp]
           }
         }
       })
@@ -171,8 +176,6 @@ export default {
       this.role = deepClone(scope.row)
       this.$nextTick(() => {
         const routes = this.generateRoutes(this.role.routes)
-        console.log(this.generateRoutes(this.role.routes))
-        console.log(this.generateArr(routes))
         this.$refs.tree.setCheckedNodes(this.generateArr(routes))
         this.checkStrictly = false
       })
@@ -193,17 +196,18 @@ export default {
         })
         .catch(err => { console.error(err) })
     },
-    generateTree(routes, basePath = '/', checkedKeys) {
+    generateTree(routes, checkedKeys) {
       const res = []
-
       for (const route of routes) {
-        const routePath = path.resolve(basePath, route.path)
-
-        if (route.children) {
-          route.children = this.generateTree(route.children, routePath, checkedKeys)
+        const id = route.id
+        if (route.permissionList) {
+          route.permissionList = this.generateTree(route.permissionList, checkedKeys)
+        } else {
+          if (route.children) {
+            route.children = this.generateTree(route.children, checkedKeys)
+          }
         }
-
-        if (checkedKeys.includes(routePath) || (route.children && route.children.length >= 1)) {
+        if (checkedKeys.includes(id) || (route.children && route.children.length >= 1) || (route.permissionList && route.permissionList.length >= 1)) {
           res.push(route)
         }
       }
@@ -212,7 +216,7 @@ export default {
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
       const checkedKeys = this.$refs.tree.getCheckedKeys()
-      this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
+      this.role.routes = this.generateTree(deepClone(this.serviceRoutes), checkedKeys)
       if (isEdit) {
         await updateRole(this.role.key, this.role)
         for (let index = 0; index < this.rolesList.length; index++) {
