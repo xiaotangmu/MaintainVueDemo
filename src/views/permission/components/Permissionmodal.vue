@@ -5,8 +5,14 @@
     width="50%"
   >
     <el-form ref="ruleForm" :model="modalValue" :rules="rules" label-width="120px">
-      <el-form-item label="权限名称" prop="name">
+      <el-form-item label="权限标识" prop="name">
         <el-input v-model="modalValue.name" />
+      </el-form-item>
+      <el-form-item label="权限名称" prop="remark1">
+        <el-input v-model="modalValue.remark1" />
+      </el-form-item>
+      <el-form-item label="权限描述" prop="remark2">
+        <el-input v-model="modalValue.remark2" />
       </el-form-item>
       <el-form-item label="父级菜单名称" prop="pid">
         <TreeSelect
@@ -77,7 +83,9 @@ export default {
         sort: 0,
         pid: '',
         enable: 1,
-        permissionId: ''
+        permissionId: '',
+        remark1: '',
+        remark2: ''
       },
       rules: {
         name: [{ required: true, message: '请输入权限名称', trigger: 'blur' }],
@@ -112,6 +120,8 @@ export default {
       this.modalValue.name = ''
       this.modalValue.sort = 0
       this.modalValue.enable = 1
+      this.modalValue.remark1 = ''
+      this.modalValue.remark2 = ''
     },
     edit(row) {
       this.type = '编辑'
@@ -123,6 +133,8 @@ export default {
       this.modalValue.name = row.name
       this.modalValue.sort = row.sort
       this.modalValue.path = row.enable
+      this.modalValue.remark1 = row.remark1
+      this.modalValue.remark2 = row.remark2
     },
     submit() {
       this.$refs.ruleForm.validate((valid) => {
@@ -140,8 +152,8 @@ export default {
         'Enable': row.enable,
         'ParentId': row.permissionId,
         'SortNum': row.sort,
-        'Remark1': '',
-        'Remark2': '',
+        'Remark1': row.remark1,
+        'Remark2': row.remark2,
         'Name': row.name
       })
       const obj = deepClone(row)
@@ -157,8 +169,8 @@ export default {
         'Enable': row.enable,
         'ParentId': row.permissionId,
         'SortNum': row.sort,
-        'Remark1': '',
-        'Remark2': '',
+        'Remark1': row.remark1,
+        'Remark2': row.remark2,
         'Name': row.name
       })
       this.dialogVisible = false

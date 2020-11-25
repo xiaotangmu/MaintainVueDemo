@@ -16,7 +16,9 @@
 
       <el-main>
         <el-table :data="permissionData">
+          <el-table-column prop="name" label="标识" />
           <el-table-column prop="name" label="名称" />
+          <el-table-column prop="name" label="描述" />
           <el-table-column prop="sort" label="排序" sortable />
           <el-table-column label="启用">
             <template slot-scope="scope">
@@ -137,7 +139,9 @@ export default {
             enable: _.Enable,
             permissionId: _.ParentId,
             sort: _.SortNum,
-            name: _.Name
+            name: _.Name,
+            remark1: _.Remark1,
+            remark2: _.Remark2
           }
         })
       })
