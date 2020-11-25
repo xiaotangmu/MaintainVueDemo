@@ -21,7 +21,7 @@ router.beforeEach(async(to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      const hasRoutes = store.getters.routes || store.getters.routes === []
+      const hasRoutes = store.getters.routes || store.getters.routes instanceof Array
       if (hasRoutes) {
         next()
       } else {

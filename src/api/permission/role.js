@@ -1,38 +1,49 @@
 import request from '@/utils/request'
+import { url } from '@/api/proxy'
 
-export function getRoutes() {
+export function getRoles(query) {
   return request({
-    url: '/vue-element-admin/routes',
-    method: 'get'
+    url: url + '/RoleManagement/GetRoleListWithMenuWithPaging',
+    method: 'get',
+    params: query
   })
 }
 
-export function getRoles() {
+export function getRolesAll() {
   return request({
-    url: '/vue-element-admin/roles',
+    url: url + '/RoleManagement/GetAllNoMenu',
     method: 'get'
   })
 }
 
 export function addRole(data) {
   return request({
-    url: '/vue-element-admin/role',
+    url: url + '/RoleManagement/Add',
     method: 'post',
     data
   })
 }
 
-export function updateRole(id, data) {
+export function updateRole(data) {
   return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'put',
+    url: url + `/RoleManagement/Update`,
+    method: 'post',
     data
   })
 }
 
-export function deleteRole(id) {
+export function enableRole(data) {
   return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'delete'
+    url: url + `/RoleManagement/EnableRole`,
+    method: 'post',
+    data
+  })
+}
+
+export function deleteRole(data) {
+  return request({
+    url: url + `/RoleManagement/Delete`,
+    method: 'delete',
+    data
   })
 }

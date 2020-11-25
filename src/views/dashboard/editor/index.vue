@@ -12,6 +12,12 @@
       </div>
     </div>
     <div>
+      {{ msg }}
+      <el-button @click="getData">测试Auth</el-button><br>
+      {{ msg1 }}
+      <el-button @click="getData1">测试NeedRole</el-button><br>
+      {{ msg2 }}
+      <el-button @click="getData2">测试NoAuth</el-button><br>
       <img :src="emptyGif" class="emptyGif">
     </div>
   </div>
@@ -21,12 +27,16 @@
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
 import GithubCorner from '@/components/GithubCorner'
+import { test1, test2, test3 } from '@/api/test'
 
 export default {
   name: 'DashboardEditor',
   components: { PanThumb, GithubCorner },
   data() {
     return {
+      msg: '信息',
+      msg1: '信息',
+      msg2: '信息',
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
     }
   },
@@ -36,6 +46,23 @@ export default {
       'avatar',
       'role'
     ])
+  },
+  methods: {
+    getData() {
+      test1().then(res => {
+        this.msg = res
+      })
+    },
+    getData1() {
+      test3().then(res => {
+        this.msg1 = res
+      })
+    },
+    getData2() {
+      test2().then(res => {
+        this.msg2 = res
+      })
+    }
   }
 }
 </script>

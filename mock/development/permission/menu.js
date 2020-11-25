@@ -6,6 +6,7 @@ const routes = [{
   redirect: '/permission/menu',
   hidden: false,
   name: 'Permission',
+  sort: 10,
   meta: { title: '权限管理', icon: 'lock' },
   children: [
     {
@@ -15,6 +16,7 @@ const routes = [{
       component: 'permission_menu',
       name: 'Menu',
       meta: { title: '菜单管理', icon: '' },
+      sort: 5,
       permission: [
         {
           isPermission: true,
@@ -29,7 +31,8 @@ const routes = [{
       path: 'role',
       component: 'permission_role',
       name: 'Role',
-      meta: { title: '角色管理', icon: '' }
+      meta: { title: '角色管理', icon: '' },
+      sort: 1
     },
     {
       id: '1-3',
@@ -37,7 +40,8 @@ const routes = [{
       path: 'grant',
       component: 'permission_grant',
       name: 'Grant',
-      meta: { title: '授权管理', icon: '' }
+      meta: { title: '授权管理', icon: '' },
+      sort: 3
     }
   ]
 },
@@ -49,6 +53,7 @@ const routes = [{
   redirect: '/category/catalog',
   hidden: false,
   name: 'Category',
+  sort: 9,
   meta: { title: '分类管理', icon: 'nested' },
   children: [
     {
@@ -57,7 +62,8 @@ const routes = [{
       path: 'catalog',
       component: 'category_catalog',
       name: 'Catalog',
-      meta: { title: '分类目录', icon: '' }
+      meta: { title: '分类目录', icon: '' },
+      sort: 3
     },
     {
       id: '2-2',
@@ -65,7 +71,8 @@ const routes = [{
       path: 'attr',
       component: 'category_attr',
       name: 'Attr',
-      meta: { title: '分类属性', icon: '' }
+      meta: { title: '分类属性', icon: '' },
+      sort: 4
     }
   ]
 }]

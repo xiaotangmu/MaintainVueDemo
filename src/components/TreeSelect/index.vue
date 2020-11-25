@@ -32,7 +32,7 @@ export default {
       default: () => {
         return {
           value: 'id', // ID字段名
-          label: 'title', // 显示名称
+          label: 'name', // 显示名称
           children: 'children' // 子级字段名
         }
       }
@@ -60,6 +60,18 @@ export default {
     placeholder: {
       type: String,
       default: () => { return '检索关键字' }
+    },
+    chooseLeaf: {
+      type: Boolean,
+      default: () => { return false }
+    },
+    filterArr: {
+      type: Array,
+      default: () => { return [] }
+    },
+    filterKey: {
+      type: Array,
+      default: () => {}
     }
   },
   data() {
@@ -77,15 +89,23 @@ export default {
     },
     filterText(val) {
       this.$refs.selectTree.filter(val)
+    },
+    filterArr(val) {
+      this.$refs.selectTree.filter(this.filterText)
     }
   },
   mounted() {
     this.initHandle()
+    this.$refs.selectTree.filter()
   },
   methods: {
     // 初始化值
     initHandle() {
       if (this.valueId) {
+        if (!this.$refs.selectTree.getNode(this.valueId)) {
+          this.valueTitle = this.valueId
+          return
+        }
         this.valueTitle = this.$refs.selectTree.getNode(this.valueId).data[this.props.label] // 初始化显示
         this.$refs.selectTree.setCurrentKey(this.valueId) // 设置默认选中
         this.defaultExpandedKey = [this.valueId] // 设置默认展开
@@ -102,10 +122,13 @@ export default {
       })
     },
     // 切换选项
-    handleNodeClick(node) {
-      this.valueTitle = node[this.props.label]
-      this.valueId = node[this.props.value]
-      this.$emit('getValue', this.valueId)
+    handleNodeClick(data, node) {
+      if (this.chooseLeaf && node.isLeaf === false) {
+        return
+      }
+      this.valueTitle = data[this.props.label]
+      this.valueId = data[this.props.value]
+      this.$emit('getValue', this.valueId, data)
       this.defaultExpandedKey = []
     },
     // 清除选中
@@ -122,8 +145,16 @@ export default {
       allNode.forEach((element) => element.classList.remove('is-current'))
     },
     filterNode(value, data) {
-      if (!value) return true
-      return data.name.indexOf(value) !== -1
+      let bool = true
+      let key = true
+      if (this.filterArr) {
+        bool = !this.filterArr.includes(data.id)
+      }
+      if (this.filterKey) {
+        key = data[this.filterKey.key] !== this.filterKey.value
+      }
+      if (!value) return bool && key
+      return data.name.indexOf(value) !== -1 && bool && key
     }
   }
 }

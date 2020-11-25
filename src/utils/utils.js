@@ -24,6 +24,7 @@ export function delEmpty(obj) {
 }
 
 export function delByKey(arr, key, value) {
+  arr = JSON.parse(JSON.stringify(arr))
   return arr.filter(i => i[key] !== value).map(j => {
     if (j.children) {
       j.children = delByKey(j.children, key, value)
@@ -73,9 +74,8 @@ export function toMoney(num) {
 
 // 生成树
 export function getTreeData(arr, pid) {
-  pid = pid || ''
-  let target = []
-  target = arr.filter(i => {
+  pid = pid || '0'
+  let target = arr.filter(i => {
     i.pid === pid
   })
   const filterArr = arr.filter(i => {
@@ -170,4 +170,58 @@ export function updObjByKey(arr, key, value, obj) {
     isOver: false,
     arr
   }
+}
+
+export function generateMenu(arr) {
+  return arr.map(i => {
+    let list = []
+    if (i.PermissionList) {
+      list = i.PermissionList.map(_ => {
+        return {
+          id: _.Id,
+          permission: true,
+          title: _.Name + '(pItem)'
+        }
+      })
+    }
+    return {
+      id: i.Id,
+      name: i.Code || '',
+      sort: i.SortNum,
+      pid: i.ParentId,
+      path: i.Path,
+      component: i.Component,
+      meta: {
+        icon: i.Icon,
+        title: i.Title,
+        noCatch: i.NoCache
+      },
+      redirect: i.Redirect,
+      hidden: i.Hidden,
+      level: i.Level,
+      leaf: i.Leaf,
+      children: generateMenu(i.Children),
+      permissionList: list,
+      permissionId: i.PermissionId
+    }
+  })
+}
+
+export function generateMenuApi(arr) {
+  return arr.map(i => {
+    let list = []
+    if (i.permissionList) {
+      list = i.permissionList.map(_ => {
+        return {
+          PermissionId: _.Id
+        }
+      })
+    }
+    const obj = {
+      PermissionList: list,
+      Children: generateMenuApi(i.children),
+      PermissionId: i.permissionId
+    }
+    return obj
+  })
 }

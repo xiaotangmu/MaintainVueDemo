@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { url } from '@/api/proxy'
 
 export function getRoutes(query) {
   return request({
@@ -8,23 +9,30 @@ export function getRoutes(query) {
   })
 }
 
-export function delMenu(data) {
+export function getMenus(query) {
   return request({
-    url: '/permission/menu/delete',
+    url: url + '/ResourceManagement/GetAll',
+    method: 'get',
+    params: query
+  })
+}
+export function delMenu(query) {
+  return request({
+    url: url + '/ResourceManagement/DeleteResource',
     method: 'delete',
-    data
+    params: query
   })
 }
 export function addMenu(data) {
   return request({
-    url: '/permission/menu/add',
+    url: url + '/ResourceManagement/AddResource',
     method: 'post',
     data
   })
 }
 export function updMenu(data) {
   return request({
-    url: '/permission/menu/update',
+    url: url + '/ResourceManagement/UpdateResource',
     method: 'post',
     data
   })

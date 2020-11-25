@@ -7,7 +7,9 @@ function getRouter(routes) {
     const obj = {}
     Object.keys(_).forEach(i => {
       if (i !== 'children') {
-        obj[i] = _[i]
+        if (_[i] !== '') {
+          obj[i] = _[i]
+        }
       } else {
         obj[i] = getRouter(_[i])
       }

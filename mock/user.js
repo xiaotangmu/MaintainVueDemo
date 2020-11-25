@@ -12,7 +12,7 @@ const routes = [{
   path: '/permission',
   component: 'Layout',
   redirect: '/permission/menu',
-  hidden: false,
+  hidden: 0,
   name: 'Permission',
   meta: { title: '权限管理', icon: 'lock' },
   children: [
@@ -33,6 +33,12 @@ const routes = [{
       component: 'permission_grant',
       name: 'Grant',
       meta: { title: '授权管理', icon: '' }
+    },
+    {
+      path: 'list',
+      component: 'permission_list',
+      name: 'List',
+      meta: { title: '权限列表', icon: '' }
     }
   ]
 },

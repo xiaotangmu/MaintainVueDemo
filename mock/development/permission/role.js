@@ -25,7 +25,19 @@ const routes = [{
     {
       id: '2',
       path: 'role',
-      meta: { title: '角色管理', icon: '' }
+      meta: { title: '角色管理', icon: '' },
+      permissionList: [
+        {
+          id: '2-0',
+          permission: '007',
+          title: '权限007'
+        },
+        {
+          id: '2-1',
+          permission: '008',
+          title: '权限008'
+        }
+      ]
     }
   ]
 }]
@@ -103,8 +115,8 @@ module.exports = [
     url: '/vue-element-admin/role/[A-Za-z0-9]',
     type: 'put',
     response: {
-      code: 1,
-      message: 'error'
+      code: 20000,
+      message: 'success'
     }
   },
 

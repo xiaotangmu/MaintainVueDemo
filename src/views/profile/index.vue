@@ -48,7 +48,8 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
-      'routes'
+      'routes',
+      'role'
     ])
   },
   created() {
@@ -58,7 +59,7 @@ export default {
     getUser() {
       this.user = {
         name: this.name,
-        role: this.routes.join(' | '),
+        role: this.role,
         email: 'admin@test.com',
         avatar: this.avatar
       }

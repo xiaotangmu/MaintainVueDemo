@@ -1,11 +1,17 @@
 <template>
   <div class="app-container">
+    <el-input v-model="search.SearchStr" placeholder="模糊查询" style="width: 350px;">
+      <el-select slot="prepend" v-model="search.Enable" placeholder="请选择" style="width: 80px;">
+        <el-option v-for="i in options" :key="i.value" :value="i.value" :label="i.label" />
+      </el-select>
+      <el-button slot="append" type="primary" icon="el-icon-search" @click="getRoles()" />
+    </el-input>
     <el-button type="primary" @click="handleAddRole">新增</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" stripe>
-      <el-table-column align="center" label="角色编号" width="220">
+      <el-table-column align="center" label="角色标识" width="220">
         <template slot-scope="scope">
-          {{ scope.row.key }}
+          {{ scope.row.flag }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="角色名称" width="220">
@@ -18,6 +24,18 @@
           {{ scope.row.description }}
         </template>
       </el-table-column>
+      <el-table-column label="启用">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.enable"
+            active-color="#13ce66"
+            inactive-color="#aaa"
+            :active-value="1"
+            :inactive-value="0"
+            @change="changeEnable(scope.row)"
+          />
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="handleEdit(scope)">编辑</el-button>
@@ -26,8 +44,22 @@
       </el-table-column>
     </el-table>
 
+    <el-pagination
+      style="text-align: center;margin-top: 10px;"
+      :current-page="search.PageIndex"
+      :page-sizes="[10, 15, 20, 50]"
+      :page-size="search.PageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      @size-change="getRoles"
+      @current-change="getRoles"
+    />
+
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新增角色'">
       <el-form ref="ruleForm" :model="role" :rules="rules" label-width="80px">
+        <el-form-item label="角色标识" prop="flag">
+          <el-input v-model="role.flag" placeholder="角色标识" />
+        </el-form-item>
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="role.name" placeholder="角色名称" />
         </el-form-item>
@@ -39,8 +71,15 @@
             placeholder="角色描述"
           />
         </el-form-item>
-        <el-form-item label="菜单">
+        <el-form-item label="状态" prop="enable">
+          <el-select v-model="role.enable">
+            <el-option label="启用" :value="1" />
+            <el-option label="禁用" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="菜单/权限">
           <el-tree
+            v-if="dialogVisible"
             ref="tree"
             :check-strictly="checkStrictly"
             :data="routesData"
@@ -48,7 +87,29 @@
             show-checkbox
             node-key="id"
             class="permission-tree"
-          />
+            :default-expanded-keys="expandedArr"
+            @check="nodeClick"
+          >
+            <span slot-scope="{ node }">
+              <span v-if="/\(pItem\)$/.test(node.label)">
+                {{ node.label.replace(/\(pItem\)$/, '') }}
+                <el-tag size="mini" type="success">子权限</el-tag>
+              </span>
+              <span v-else>
+                {{ node.label }}
+              </span>
+              <span v-if="!node.isLeaf">
+                <el-button
+                  type="text"
+                  size="mini"
+                  style="margin-left: 10px;"
+                  @click.stop="() => handleNodeClick(node)"
+                >
+                  全选
+                </el-button>
+              </span>
+            </span>
+          </el-tree>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -60,13 +121,16 @@
 </template>
 
 <script>
-import path from 'path'
 import { deepClone } from '@/utils'
-import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/permission/role'
+import { getRoles, addRole, deleteRole, updateRole, enableRole } from '@/api/permission/role'
+import { generateMenu, delEmpty, generateMenuApi } from '@/utils/utils'
+import { getMenus } from '@/api/permission/menu'
 
 const defaultRole = {
   key: '',
+  flag: '',
   name: '',
+  enable: 1,
   description: '',
   routes: []
 }
@@ -74,18 +138,39 @@ const defaultRole = {
 export default {
   data() {
     return {
+      total: 0,
+      search: {
+        SearchStr: '',
+        Enable: -1,
+        PageIndex: 1,
+        PageSize: 10
+      },
+      options: [
+        { label: '启用',
+          value: 1
+        },
+        { label: '禁用',
+          value: 0
+        },
+        { label: '全部',
+          value: -1
+        }
+      ],
+      expandedArr: [],
       role: Object.assign({}, defaultRole),
       routes: [],
       rolesList: [],
       dialogVisible: false,
       dialogType: 'new',
-      checkStrictly: false,
+      checkStrictly: true,
       defaultProps: {
         children: 'children',
         label: 'title'
       },
       rules: {
-        name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
+        flag: [{ required: true, message: '请输入角色标识', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        enable: [{ required: true, message: '请选择角色状态', trigger: 'blur' }]
       }
     }
   },
@@ -99,6 +184,56 @@ export default {
     this.getRoles()
   },
   methods: {
+    handleNodeClick(node) {
+      this.$refs.tree.setChecked(node.data.id, !node.checked)
+      this.checkedChild(node, node.checked)
+    },
+    checkedChild(node, bool) {
+      if (node.childNodes) {
+        node.childNodes.forEach(i => {
+          this.$refs.tree.setChecked(i.data.id, bool)
+          this.checkedChild(i, bool)
+        })
+      }
+    },
+    changeEnable(row) {
+      enableRole({
+        Id: row.key,
+        Name: row.flag,
+        Enable: row.enable
+      }).then(() => {
+        this.success()
+      }).catch(() => {
+        if (row.enable) {
+          row.enable = 0
+        } else {
+          row.enable = 1
+        }
+      })
+    },
+    nodeClick(data) {
+      const node = this.$refs.tree.getNode(data.id)
+      this.childNodesChange(node)
+      this.parentNodesChange(node)
+    },
+    childNodesChange(node) {
+      if (!node.checked) {
+        if (node.childNodes) {
+          node.childNodes.forEach(i => {
+            this.$refs.tree.setChecked(i.data.id, false)
+            this.childNodesChange(i)
+          })
+        }
+      }
+    },
+    parentNodesChange(node) {
+      if (node.checked) {
+        if (node.parent) {
+          this.$refs.tree.setChecked(node.parent.data.id, true)
+          this.parentNodesChange(node.parent)
+        }
+      }
+    },
     submit() {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
@@ -107,17 +242,31 @@ export default {
       })
     },
     async getRoutes() {
-      const res = await getRoutes()
-      this.serviceRoutes = res.data
-      this.routes = this.generateRoutes(res.data)
+      const res = await getMenus({ HasPermission: 1 })
+      this.serviceRoutes = generateMenu(res.data)
+      this.routes = this.generateRoutes(this.serviceRoutes)
     },
     async getRoles() {
-      const res = await getRoles()
-      this.rolesList = res.data
+      const res = await getRoles(delEmpty(this.search))
+      this.total = res.data.TotalCount
+      this.rolesList = res.data.Items.map(_ => {
+        const obj = {
+          flag: _.Name,
+          key: _.Id,
+          name: _.Remark1,
+          description: _.Remark2,
+          enable: _.Enable,
+          routes: []
+        }
+        if (_.Menu) {
+          obj.routes = generateMenu(_.Menu)
+        }
+        return obj
+      })
     },
-    generateRoutes(routes, basePath = '/') {
+    generateRoutes(routes) {
       const res = []
-      for (let route of routes) {
+      for (const route of routes) {
         let data = {}
         if (route.permission) {
           data = {
@@ -126,21 +275,15 @@ export default {
             title: route.title
           }
         } else {
-          if (route.hidden) { continue }
-          const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
-          if (route.children && onlyOneShowingChild && !route.alwaysShow) {
-            route = onlyOneShowingChild
-          }
           data = {
             id: route.id,
-            path: path.resolve(basePath, route.path),
             title: route.meta && route.meta.title
           }
           if (route.permissionList && route.permissionList.length > 0) {
-            data.children = this.generateRoutes(route.permissionList, data.path)
+            data.children = this.generateRoutes(route.permissionList)
           } else {
             if (route.children) {
-              data.children = this.generateRoutes(route.children, data.path)
+              data.children = this.generateRoutes(route.children)
             }
           }
         }
@@ -162,6 +305,7 @@ export default {
       return data
     },
     handleAddRole() {
+      this.expandedArr = []
       this.role = Object.assign({}, defaultRole)
       if (this.$refs.tree) {
         this.$refs.tree.setCheckedNodes([])
@@ -170,14 +314,16 @@ export default {
       this.dialogVisible = true
     },
     handleEdit(scope) {
+      this.expandedArr = []
       this.dialogType = 'edit'
       this.dialogVisible = true
-      this.checkStrictly = true
       this.role = deepClone(scope.row)
       this.$nextTick(() => {
-        const routes = this.generateRoutes(this.role.routes)
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes))
-        this.checkStrictly = false
+        const nodes = this.generateArr(this.generateRoutes(this.role.routes))
+        if (nodes) {
+          this.expandedArr = nodes
+        }
+        this.$refs.tree.setCheckedNodes(nodes)
       })
     },
     handleDelete({ $index, row }) {
@@ -187,7 +333,10 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          await deleteRole(row.key)
+          await deleteRole({
+            Id: row.key,
+            Name: row.flag
+          })
           this.rolesList.splice($index, 1)
           this.$message({
             type: 'success',
@@ -197,28 +346,29 @@ export default {
         .catch(err => { console.error(err) })
     },
     generateTree(routes, checkedKeys) {
-      const res = []
-      for (const route of routes) {
-        const id = route.id
-        if (route.permissionList) {
-          route.permissionList = this.generateTree(route.permissionList, checkedKeys)
-        } else {
-          if (route.children) {
-            route.children = this.generateTree(route.children, checkedKeys)
-          }
+      return routes.filter(i => checkedKeys.includes(i.id)).map(_ => {
+        if (_.children) {
+          _.children = this.generateTree(_.children, checkedKeys)
         }
-        if (checkedKeys.includes(id) || (route.children && route.children.length >= 1) || (route.permissionList && route.permissionList.length >= 1)) {
-          res.push(route)
+        if (_.permissionList) {
+          _.permissionList = this.generateTree(_.permissionList, checkedKeys)
         }
-      }
-      return res
+        return _
+      })
     },
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
       const checkedKeys = this.$refs.tree.getCheckedKeys()
       this.role.routes = this.generateTree(deepClone(this.serviceRoutes), checkedKeys)
       if (isEdit) {
-        await updateRole(this.role.key, this.role)
+        await updateRole({
+          Name: this.role.flag,
+          Id: this.role.key,
+          Remark1: this.role.name,
+          Remark2: this.role.description,
+          Enable: this.role.enable,
+          Menu: generateMenuApi(this.role.routes)
+        })
         for (let index = 0; index < this.rolesList.length; index++) {
           if (this.rolesList[index].key === this.role.key) {
             this.rolesList.splice(index, 1, Object.assign({}, this.role))
@@ -226,7 +376,14 @@ export default {
           }
         }
       } else {
-        const { data } = await addRole(this.role)
+        const { data } = await addRole({
+          Name: this.role.flag,
+          Id: this.role.key,
+          Remark1: this.role.name,
+          Remark2: this.role.description,
+          Enable: this.role.enable,
+          Menu: generateMenuApi(this.role.routes)
+        })
         this.role.key = data.key
         this.rolesList.push(this.role)
       }
@@ -244,21 +401,11 @@ export default {
         type: 'success'
       })
     },
-    onlyOneShowingChild(children = [], parent) {
-      let onlyOneChild = null
-      const showingChildren = children.filter(item => !item.hidden)
-
-      if (showingChildren.length === 1) {
-        onlyOneChild = showingChildren[0]
-        onlyOneChild.path = path.resolve(parent.path, onlyOneChild.path)
-        return onlyOneChild
-      }
-      if (showingChildren.length === 0) {
-        onlyOneChild = { ... parent, path: '', noShowingChildren: true }
-        return onlyOneChild
-      }
-
-      return false
+    success() {
+      this.$message({
+        type: 'success',
+        message: '操作成功'
+      })
     }
   }
 }
