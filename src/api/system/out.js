@@ -50,3 +50,24 @@ export function remarkOut(data) {
     data
   })
 }
+export function delItems(data) {
+  return request({
+    url: url + '/Out/UpdateDeleteSku',
+    method: 'post',
+    data
+  })
+}
+export function addItems(data) {
+  return request({
+    url: url + '/Out/UpdateAddSkuList',
+    method: 'post',
+    data
+  })
+}
+export function updItems(data) {
+  return request({
+    url: url + '/Out/UpdateSkuList',
+    method: 'post',
+    data
+  })
+}

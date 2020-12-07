@@ -241,7 +241,9 @@ export default {
         SearchStr: '',
         StartTime: '',
         EndTime: '',
-        Status: -1
+        Status: -1,
+        ToolStatus: -1,
+        OldPartStatus: -1
       },
       activeName: 'first',
       column: [

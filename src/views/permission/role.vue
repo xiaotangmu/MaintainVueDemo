@@ -6,7 +6,7 @@
       </el-select>
       <el-button slot="append" type="primary" icon="el-icon-search" @click="getRoles()" />
     </el-input>
-    <el-button type="primary" @click="handleAddRole">新增</el-button>
+    <el-button type="primary" :disabled="!(permission.includes('role:add'))" @click="handleAddRole">新增</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" stripe>
       <el-table-column align="center" label="角色标识" width="220">
@@ -38,8 +38,8 @@
       </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" @click="handleEdit(scope)">编辑</el-button>
-          <el-button type="danger" @click="handleDelete(scope)">删除</el-button>
+          <el-button type="primary" :disabled="!(permission.includes('role:edit'))" @click="handleEdit(scope)">编辑</el-button>
+          <el-button type="danger" :disabled="!(permission.includes('role:delete'))" @click="handleDelete(scope)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,6 +121,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { deepClone } from '@/utils'
 import { getRoles, addRole, deleteRole, updateRole, enableRole } from '@/api/permission/role'
 import { generateMenu, delEmpty, generateMenuApi } from '@/utils/utils'
@@ -175,6 +176,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['permission']),
     routesData() {
       return this.routes
     }

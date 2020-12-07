@@ -6,10 +6,11 @@
   >
     <el-form ref="ruleForm" :model="menu" :rules="rules" label-width="120px">
       <el-form-item label="菜单名称" prop="name">
-        <el-input v-model="menu.name" />
+        <el-input v-model="menu.name" :disabled="!permission.includes('menu:edit:name,component,path,pid,isLeaf')" />
       </el-form-item>
       <el-form-item label="父级菜单名称" prop="pid">
         <TreeSelect
+          :disabled="!permission.includes('menu:edit:name,component,path,pid,isLeaf')"
           :props="props"
           :options="options"
           :value="menu.pid"
@@ -23,19 +24,19 @@
         />
       </el-form-item>
       <el-form-item label="路径" prop="path">
-        <el-input v-model="menu.path" @change="validatePath" />
+        <el-input v-model="menu.path" :disabled="!permission.includes('menu:edit:name,component,path,pid,isLeaf')" @change="validatePath" />
       </el-form-item>
       <el-form-item label="标题" prop="meta.title">
         <el-input v-model="menu.meta.title" clearable />
       </el-form-item>
       <el-form-item label="类型" prop="leaf">
-        <el-select v-model="menu.leaf">
+        <el-select v-model="menu.leaf" :disabled="!permission.includes('menu:edit:name,component,path,pid,isLeaf')">
           <el-option label="菜单" :value="1" />
           <el-option label="目录" :value="0" />
         </el-select>
       </el-form-item>
       <el-form-item label="组件名" prop="component">
-        <el-select v-model="menu.component" filterable clearable placeholder="请选择">
+        <el-select v-model="menu.component" :disabled="!permission.includes('menu:edit:name,component,path,pid,isLeaf')" filterable clearable placeholder="请选择">
           <el-option
             v-for="item in cpnOptions"
             :key="item"
@@ -84,6 +85,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { deepClone } from '@/utils'
 import { addMenu, updMenu } from '@/api/permission/menu'
 import { cpnArr } from '@/config/components'
@@ -130,7 +132,8 @@ export default {
         },
         redirect: '',
         hidden: '',
-        children: []
+        children: [],
+        permissionList: []
       },
       rules: {
         name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
@@ -142,6 +145,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['permission']),
     disable() {
       return this.type === '编辑'
     },
@@ -160,6 +164,15 @@ export default {
     }
   },
   watch: {
+    'menu.leaf'(val) {
+      if (val === 0 && this.menu.permissionList.length > 0) {
+        this.menu.leaf = 1
+        this.$message({ message: '该菜单有绑定权限， 不能变更为目录', type: 'warning' })
+      } else if (val === 1 && this.menu.children.length > 0) {
+        this.menu.leaf = 0
+        this.$message({ message: '存在子级，不能变更为菜单', type: 'warning' })
+      }
+    },
     'menu.pid'(val) {
       if (val !== '0') {
         if (this.menu.path.charAt(0) === '/') {
@@ -207,6 +220,7 @@ export default {
       this.menu.redirect = ''
       this.menu.hidden = 0
       this.menu.children = []
+      this.menu.permissionList = []
       this.menu.level = 0
     },
     edit(row, pid) {
@@ -226,6 +240,7 @@ export default {
       this.menu.redirect = row.redirect || ''
       this.menu.hidden = row.hidden
       this.menu.children = row.children || []
+      this.menu.permissionList = row.permissionList || []
       this.menu.level = row.level || 0
     },
     submit() {

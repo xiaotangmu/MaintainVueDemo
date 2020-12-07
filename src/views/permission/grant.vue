@@ -6,7 +6,7 @@
       </el-select>
       <el-button slot="append" type="primary" icon="el-icon-search" @click="getList()" />
     </el-input>
-    <el-button type="primary" @click="handleAddUser">新增</el-button>
+    <el-button type="primary" :disabled="!permission.includes('grant:add')" @click="handleAddUser">新增</el-button>
 
     <el-table :data="usersList" style="width: 100%;margin-top:30px;" stripe>
       <el-table-column type="expand" label="备注">
@@ -43,9 +43,9 @@
       </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" @click="handleEdit(scope)">编辑</el-button>
-          <el-button type="warning" @click="handleReset(scope.row)">重置</el-button>
-          <el-button type="danger" @click="handleDelete(scope)">删除</el-button>
+          <el-button type="primary" :disabled="!permission.includes('grant:edit')" @click="handleEdit(scope)">编辑</el-button>
+          <el-button type="warning" :disabled="!permission.includes('grant:reset')" @click="handleReset(scope.row)">重置</el-button>
+          <el-button type="danger" :disabled="!permission.includes('grant:delete')" @click="handleDelete(scope)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -108,6 +108,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { deepClone } from '@/utils'
 import { delEmpty } from '@/utils/utils'
 import { getUsers, addUser, deleteUser, updateUser, enableUser, resetUser } from '@/api/permission/grant'
@@ -153,6 +154,9 @@ export default {
         enable: [{ required: true, message: '请输入用户名称', trigger: 'blur' }]
       }
     }
+  },
+  computed: {
+    ...mapGetters(['permission'])
   },
   watch: {
     'user.roleKey': {

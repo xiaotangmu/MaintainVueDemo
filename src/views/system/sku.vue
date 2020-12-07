@@ -36,6 +36,10 @@
                 style="width: 100%"
               >
                 <el-table-column
+                  prop="SkuNo"
+                  label="库存编号"
+                />
+                <el-table-column
                   prop="Room"
                   label="房间"
                 />
@@ -43,20 +47,14 @@
                   prop="Self"
                   label="货架"
                 />
-                <el-table-column
-                  prop="Quantity"
-                  label="数量"
-                />
-                <el-table-column
-                  label="参考价格"
-                >
-                  <template slot-scope="scope">
-                    {{ scope.row.Price | toMoney }}
-                  </template>
-                </el-table-column>
                 <el-table-column label="新旧">
                   <template slot-scope="scope">
                     {{ scope.row.Status === 0 ? "新" : "旧" }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="状态">
+                  <template slot-scope="scope">
+                    {{ scope.row.Status2 === 0 ? "库存" : scope.row.Status2 === 1 ? "寄件（维修中）" : "问题件，待寄修" }}
                   </template>
                 </el-table-column>
               </el-table>
@@ -140,7 +138,7 @@ export default {
         { label: '库存描述', model: 'Description' },
         { label: '警报值', model: 'Alarm' },
         { label: '品牌', model: 'Brand' },
-        { label: '金额', model: 'Price' },
+        { label: '单价', model: 'Price' },
         { label: '数量', model: 'TotalCount' },
         { label: '单位', model: 'Unit' },
         { label: '属性', model: 'AttrList' },

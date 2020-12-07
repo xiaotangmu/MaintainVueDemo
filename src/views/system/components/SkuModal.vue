@@ -67,7 +67,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="参考价格">
+          <el-form-item label="单价">
             <el-input-number v-model="modal.Price" :precision="2" :step="1" />
           </el-form-item>
         </el-col>
@@ -123,6 +123,10 @@
             </template>
           </el-table-column>
           <el-table-column
+            prop="SkuNo"
+            label="库存编号"
+          />
+          <el-table-column
             prop="Room"
             label="房间"
           />
@@ -130,20 +134,14 @@
             prop="Self"
             label="货架"
           />
-          <el-table-column
-            prop="Quantity"
-            label="数量"
-          />
-          <el-table-column
-            label="单价"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.Price | toMoney }}
-            </template>
-          </el-table-column>
           <el-table-column label="新旧">
             <template slot-scope="scope">
               {{ scope.row.Status === 0 ? "新" : "旧" }}
+            </template>
+          </el-table-column>
+          <el-table-column label="状态">
+            <template slot-scope="scope">
+              {{ scope.row.Status2 === 0 ? "库存" : scope.row.Status2 === 1 ? "寄件（维修中）" : "问题件，待寄修" }}
             </template>
           </el-table-column>
         </el-table>
@@ -157,26 +155,30 @@
       :title="valueTitle"
       :visible.sync="valueVisible"
       :append-to-body="true"
-      width="33%"
+      width="470px"
       center
     >
       <el-form ref="valueForm" label-width="80px" :model="value" :rules="valueRule">
+        <el-form-item label="库存编号" prop="SkuNo">
+          <el-input v-model="value.SkuNo" style="width: 300px;" />
+        </el-form-item>
         <el-form-item label="房间" prop="Room">
           <el-input v-model="value.Room" style="width: 300px;" />
         </el-form-item>
         <el-form-item label="货架" prop="Self">
           <el-input v-model="value.Self" style="width: 300px;" />
         </el-form-item>
-        <el-form-item label="数量">
-          <el-input-number v-model="value.Quantity" :step="1" />
-        </el-form-item>
-        <el-form-item label="参考价格">
-          <el-input-number v-model="value.Price" :precision="2" :step="1" />
-        </el-form-item>
         <el-form-item label="新旧" prop="Status">
           <el-select v-model="value.Status" style="width: 300px;">
             <el-option :value="0" label="新" />
             <el-option :value="1" label="旧" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态" prop="Status2">
+          <el-select v-model="value.Status2" style="width: 300px;">
+            <el-option :value="0" label="库存" />
+            <el-option :value="1" label="寄件（维修中）" />
+            <el-option :value="2" label="问题件，待寄修" />
           </el-select>
         </el-form-item>
       </el-form>
@@ -201,9 +203,9 @@ export default {
       value: {
         Room: '',
         Self: '',
-        Quantity: '',
-        Price: '',
-        Status: null
+        SkuNo: '',
+        Status: null,
+        Status2: null
       },
       valueVisible: false,
       dialogVisible: false,
@@ -225,9 +227,11 @@ export default {
       options: [],
       catalog1Id: '',
       valueRule: {
+        SkuNo: [{ required: true, message: '请输入库存编号', trigger: 'blur' }],
         Room: [{ required: true, message: '请输入房间号', trigger: 'blur' }],
         Self: [{ required: true, message: '请输入货架号', trigger: 'blur' }],
-        Status: [{ required: true, message: '请选择新旧状态', trigger: 'blur' }]
+        Status: [{ required: true, message: '请选择新旧状态', trigger: 'blur' }],
+        Status2: [{ required: true, message: '请选择状态', trigger: 'blur' }]
       },
       rule: {
         Catalog2Id: [{ required: true, message: '请选择目录', trigger: 'blur' }],
@@ -247,7 +251,7 @@ export default {
     },
     totalCount() {
       return this.modal.addressList.reduce((total, item) => {
-        return total + item.Quantity
+        return total + 1
       }, 0)
     }
   },
@@ -317,7 +321,7 @@ export default {
     },
     handleEdit(index, row) {
       this.addrIndex = index
-      this.value = row
+      this.value = JSON.parse(JSON.stringify(row))
       this.valueVisible = true
       this.valueTitle = '修改位置'
     },
@@ -339,9 +343,9 @@ export default {
       this.value = {
         Room: '',
         Self: '',
-        Quantity: '',
-        Price: '',
-        Status: null
+        SkuNo: '',
+        Status: null,
+        Status2: null
       }
     },
     handleDelete(index) {

@@ -39,6 +39,12 @@ const routes = [{
       component: 'permission_list',
       name: 'List',
       meta: { title: '权限列表', icon: '' }
+    },
+    {
+      path: 'dataDict',
+      component: 'data_dict',
+      name: 'dataDict',
+      meta: { title: '字典管理', icon: '' }
     }
   ]
 },

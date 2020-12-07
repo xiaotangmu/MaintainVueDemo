@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getUsername, setUsername, removeUsername } from '@/utils/auth'
 
 const state = {
   token: getToken(),
@@ -7,7 +7,8 @@ const state = {
   avatar: '',
   introduction: '',
   routes: null,
-  role: ''
+  role: '',
+  username: getUsername()
 }
 
 const mutations = {
@@ -19,6 +20,9 @@ const mutations = {
   },
   SET_NAME: (state, name) => {
     state.name = name
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -38,7 +42,9 @@ const actions = {
       login({ LoginName: username.trim(), Password: password }).then(response => {
         const { token } = response
         commit('SET_TOKEN', token)
+        commit('SET_USERNAME', username.trim())
         setToken(token)
+        setUsername(username.trim())
         resolve()
       }).catch(error => {
         reject(error)
@@ -74,15 +80,16 @@ const actions = {
   },
 
   logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
+    return new Promise(reject => {
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
-        commit('SET_routes', null)
+        commit('SET_ROUTES', null)
         removeToken()
-
+        removeUsername()
         dispatch('tagsView/delAllViews', null, { root: true })
-
-        resolve()
+        dispatch('websocket/reset', null, { root: true }).then(() => {
+          location.reload()
+        })
       }).catch(error => {
         reject(error)
       })

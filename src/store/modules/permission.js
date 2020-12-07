@@ -21,7 +21,13 @@ function getRouter(routes) {
 
 const state = {
   routes: [],
-  addRoutes: []
+  addRoutes: [],
+  permission: [
+    // 'menu:add', 'menu:delete', 'menu:edit:name,component,path,pid,isLeaf',
+    // 'permission:add', 'permission:delete', 'permission:edit',
+    // 'role:add', 'role:delete', 'role:edit',
+    // 'grant:add', 'grant:delete', 'grant:edit', 'grant:reset',
+  ]
 }
 
 const mutations = {

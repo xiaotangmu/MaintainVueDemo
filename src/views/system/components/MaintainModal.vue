@@ -16,15 +16,6 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="状态" prop="Status">
-                <el-select v-model="modal.Status" style="width: 100%;">
-                  <el-option :value="1" :label="'未处理'" />
-                  <el-option :value="2" :label="'已处理'" />
-                  <el-option :value="3" :label="'维修取消'" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
               <el-form-item label="负责人" prop="Operator">
                 <el-input v-model="modal.Operator" />
               </el-form-item>
@@ -62,35 +53,45 @@
         <el-collapse-item title="维修单信息" name="2">
           <el-card class="box-card" style="margin-bottom: 20px;">
             <div slot="header" class="clearfix">
-              <el-form-item label="维修预约单" style="margin-bottom: 0;" prop="AppointmentId">
-                <el-select v-model="modal.AppointmentId" :disabled="disable" style="width: 300px;">
-                  <el-option v-for="i in appointmentList" :key="i.Id" :value="i.Id" :label="i.CarLicense" />
-                </el-select>
-              </el-form-item>
+              <el-col :span="12">
+                <el-form-item label="绑定预约单" style="margin-bottom: 0;" prop="IsAppointment">
+                  <el-select v-model="modal.IsAppointment" :disabled="disable" style="width: 300px;">
+                    <el-option :value="0" label="不绑定" />
+                    <el-option :value="1" label="绑定" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="modal.IsAppointment === 1" :span="12">
+                <el-form-item label="维修预约单" style="margin-bottom: 0;" prop="AppointmentId">
+                  <el-select v-model="modal.AppointmentId" :disabled="disable" style="width: 300px;">
+                    <el-option v-for="i in appointmentList" :key="i.Id" :value="i.Id" :label="i.CarLicense" />
+                  </el-select>
+                </el-form-item>
+              </el-col>
             </div>
             <el-col :span="8">
               <el-form-item label="车牌号">
-                <el-input v-model="info.CarLicense" disabled />
+                <el-input v-model="modal.AppointmentModel.CarLicense" :disabled="modal.IsAppointment === 1" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="车型">
-                <el-input v-model="info.Type" disabled />
+                <el-input v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 1" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="描述">
-                <el-input v-model="info.Description" disabled />
+                <el-input v-model="modal.AppointmentModel.Description" :disabled="modal.IsAppointment === 1" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="联系人">
-                <el-input v-model="info.Contact" disabled />
+                <el-input v-model="modal.AppointmentModel.Contact" :disabled="modal.IsAppointment === 1" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="联系电话">
-                <el-input v-model="info.Phone" disabled />
+                <el-input v-model="modal.AppointmentModel.Phone" :disabled="modal.IsAppointment === 1" />
               </el-form-item>
             </el-col>
           </el-card>
@@ -364,14 +365,6 @@ export default {
       Catalog2Id: '',
       outId: '',
       outList: [],
-      info: {
-        CompanyName: '',
-        CarLicense: '',
-        Type: '',
-        Description: '',
-        Contact: '',
-        Phone: ''
-      },
       activeName: 'tool-tab',
       appointmentList: [],
       pickerOptions: {
@@ -396,17 +389,30 @@ export default {
       dialogVisible: false,
       type: '',
       modal: {
-        MaintainNo: '',
-        Staff: '',
         AppointmentId: '',
+        ChooseDictList: [
+          {
+            DictId: ''
+          }
+        ],
+        OutList: [
+          {
+            OutId: ''
+          }
+        ],
+        Staff: '',
+        IsAppointment: 0,
+        AppointmentModel: {
+          CompanyName: '',
+          CarLicense: '',
+          Description: '',
+          Type: '',
+          Phone: '',
+          Contact: ''
+        },
         StartDate: '',
-        Status: '',
         ReturnDate: '',
-        Operator: '',
-        ToolList: [],
-        OldPartList: [],
-        SkuList: [],
-        OutList: []
+        Operator: ''
       },
       loading: false,
       valueRule: {
@@ -531,8 +537,7 @@ export default {
       }
       const index = this.appointmentList.findIndex(i => i.Id === val)
       if (index > -1) {
-        this.info = this.appointmentList[index]
-        this.modal.MaintainNo = this.appointmentList[index].AppointmentNo
+        this.modal.AppointmentModel = this.appointmentList[index]
       }
     }
   },
@@ -550,7 +555,7 @@ export default {
   methods: {
     handleEdit2(index, row) {
       this.addrIndex = index
-      this.value = row
+      this.value = JSON.parse(JSON.stringify(row))
       this.valueVisible = true
       this.valueTitle = '修改配件信息'
     },
@@ -665,25 +670,30 @@ export default {
       this.part.initList = []
       this.part.asyncList = []
       this.modal = {
-        MaintainNo: '',
-        Staff: '',
         AppointmentId: '',
+        ChooseDictList: [
+          {
+            DictId: ''
+          }
+        ],
+        OutList: [
+          {
+            OutId: ''
+          }
+        ],
+        Staff: '',
+        IsAppointment: 0,
+        AppointmentModel: {
+          CompanyName: '',
+          CarLicense: '',
+          Description: '',
+          Type: '',
+          Phone: '',
+          Contact: ''
+        },
         StartDate: '',
-        Status: '',
         ReturnDate: '',
-        Operator: '',
-        ToolList: [],
-        OldPartList: [],
-        SkuList: [],
-        OutList: []
-      }
-      this.info = {
-        CompanyName: '',
-        CarLicense: '',
-        Type: '',
-        Description: '',
-        Contact: '',
-        Phone: ''
+        Operator: ''
       }
     },
     edit(row) {

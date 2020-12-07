@@ -180,7 +180,7 @@ export function generateMenu(arr) {
         return {
           id: _.Id,
           permission: true,
-          title: _.Name + '(pItem)'
+          title: _.Remark1 + '(pItem)'
         }
       })
     }
@@ -213,7 +213,7 @@ export function generateMenuApi(arr) {
     if (i.permissionList) {
       list = i.permissionList.map(_ => {
         return {
-          PermissionId: _.Id
+          PermissionId: _.id
         }
       })
     }

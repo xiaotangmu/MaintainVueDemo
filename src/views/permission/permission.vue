@@ -10,15 +10,15 @@
 
     <el-container>
       <el-header style="text-align: right; font-size: 12px">
-        <el-button type="primary" style="float: left; margin-top: 12px;" @click="handleAdd">新增</el-button>
+        <el-button type="primary" style="float: left; margin-top: 12px;" :disabled="!permission.includes('permission:add')" @click="handleAdd">新增</el-button>
         <span>{{ selectItem.meta ? selectItem.meta.title : '' }}</span>
       </el-header>
 
       <el-main>
         <el-table :data="permissionData">
           <el-table-column prop="name" label="标识" />
-          <el-table-column prop="name" label="名称" />
-          <el-table-column prop="name" label="描述" />
+          <el-table-column prop="remark1" label="名称" />
+          <el-table-column prop="remark2" label="描述" />
           <el-table-column prop="sort" label="排序" sortable />
           <el-table-column label="启用">
             <template slot-scope="scope">
@@ -34,8 +34,8 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button type="danger" @click="handleDel(scope.row)">删除</el-button>
+              <el-button type="primary" :disabled="!(permission.includes('permission:edit'))" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" :disabled="!(permission.includes('permission:delete'))" @click="handleDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import itemModal from './components/Permissionmodal'
 import { getMenus } from '@/api/permission/menu'
 import { getPermission, updatePermission, deletePermission } from '@/api/permission/list'
@@ -64,7 +65,9 @@ export default {
       tableData: []
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['permission'])
+  },
   watch: {
     selectItem: {
       handler(val) {

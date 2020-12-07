@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 20px;">
     <el-input v-model="search" style="width: 200px;margin-right: 15px;" placeholder="请输入名称" />
-    <el-button type="primary" @click="menuAdd">新增</el-button>
+    <el-button type="primary" :disabled="!permission.includes('menu:add')" @click="menuAdd">新增</el-button>
     <el-table
       style="margin-top: 20px;"
       :data="tableDataFilter"
@@ -38,7 +38,7 @@
         width="100"
         label="隐藏导航栏"
         prop="hidden"
-        :filters="[{ text: '隐藏', value: true }, { text: '显示(默认)', value: false }]"
+        :filters="[{ text: '隐藏', value: 1 }, { text: '显示(默认)', value: 0 }]"
         :filter-method="filterHandler"
       >
         <template slot-scope="scope">
@@ -62,6 +62,7 @@
           >编辑</el-button>
           <el-button
             type="danger"
+            :disabled="!permission.includes('menu:delete')"
             @click="menuDelete(scope.$index, scope.row)"
           >删除</el-button>
         </template>
@@ -72,6 +73,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { delMenu, getMenus } from '@/api/permission/menu'
 import MenuModal from './components/MenuModal'
 import { getParentById } from '@/utils/utils'
@@ -90,6 +92,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['permission']),
     // 是否过滤
     tableDataFilter() {
       if (this.search) {
@@ -217,7 +220,7 @@ export default {
     },
     getList() {
       this.loading = true
-      getMenus({ HasPermission: 0 }).then(res => {
+      getMenus({ HasPermission: 1 }).then(res => {
         const data = generateMenu(res.data)
         this.tableData = data
         this.loading = false

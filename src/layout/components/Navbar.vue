@@ -7,20 +7,17 @@
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
-
         <error-log class="errLog-container right-menu-item hover-effect" />
-
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
         <el-tooltip content="全局尺寸" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
-
       </template>
-
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <el-badge is-dot :hidden="ws_badge.user.warning === 0">
+            <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          </el-badge>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -30,12 +27,18 @@
           <router-link to="/">
             <el-dropdown-item>首页</el-dropdown-item>
           </router-link>
+          <el-dropdown-item @click.native="$refs.msgModal.visit">
+            <el-badge :value="ws_badge.user.warning.notRead" :hidden="ws_badge.user.warning === 0" :max="10">
+              消息
+            </el-badge>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">登出</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <message ref="msgModal" />
   </div>
 </template>
 
@@ -47,6 +50,7 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
+import Message from './Message'
 
 export default {
   components: {
@@ -55,13 +59,15 @@ export default {
     ErrorLog,
     Screenfull,
     SizeSelect,
-    Search
+    Search,
+    Message
   },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'device'
+      'device',
+      'ws_badge'
     ])
   },
   methods: {

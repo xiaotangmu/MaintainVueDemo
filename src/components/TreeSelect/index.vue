@@ -1,5 +1,5 @@
 <template>
-  <el-select :value="valueTitle" :clearable="clearable" @clear="clearHandle">
+  <el-select :disabled="disabled" :value="valueTitle" :clearable="clearable" @clear="clearHandle">
     <el-input
       v-model="filterText"
       class="selectInput"
@@ -26,6 +26,10 @@
 export default {
   name: 'ElTreeSelect',
   props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     /* 配置项 */
     props: {
       type: Object,

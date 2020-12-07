@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { deepClone } from '@/utils'
 import { addPermission, updatePermission } from '@/api/permission/list'
 import TreeSelect from '@/components/TreeSelect'
@@ -95,6 +96,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['permission']),
     disable() {
       return this.type === '编辑'
     },

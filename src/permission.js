@@ -18,6 +18,9 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getToken()
 
   if (hasToken) {
+    if (!store.getters.ws) {
+      store.dispatch('websocket/connect', store.getters.username)
+    }
     if (to.path === '/login') {
       next({ path: '/' })
     } else {

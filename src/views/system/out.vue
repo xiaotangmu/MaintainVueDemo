@@ -25,7 +25,7 @@
       />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
-          <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button @click="handleEdit(scope.$index, scope.row)">详情</el-button>
           <el-button
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
@@ -87,13 +87,6 @@
                 {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
               </template>
             </el-table-column>
-            <el-table-column
-              label="总金额"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price * scope.row.TotalCount | toMoney }}
-              </template>
-            </el-table-column>
           </el-table>
         </template>
       </el-table-column>
@@ -108,6 +101,12 @@
           <template slot-scope="scope">
             <template v-if="col.model === 'TotalPrice'">
               {{ scope.row.TotalPrice | toMoney }}
+            </template>
+            <template v-if="col.model === 'OutNo'">
+              <el-tag :type="scope.row.Status === 0 ? 'primary' :scope.row.Status === 1 ? 'warning': 'success'">
+                {{ scope.row.Status === 0 ? "未绑定" :scope.row.Status === 1 ? "未完成": "已完成" }}
+              </el-tag>
+              {{ scope.row.OutNo }}
             </template>
             <template v-else-if="col.model === 'OutDate'">
               {{ scope.row.OutDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
@@ -156,7 +155,6 @@ export default {
         { label: '总金额', model: 'TotalPrice' },
         { label: '出库时间', model: 'OutDate' },
         { label: '批次', model: 'Batch' },
-        { label: '客户编号', model: 'ClientId' },
         { label: '客户', model: 'ClientName' },
         { label: '备注', model: 'Description' }
       ],
@@ -208,7 +206,7 @@ export default {
       this.$refs.editModal.add()
     },
     handleEdit(index, row) {
-      this.$refs.editModal.edit(row)
+      this.$refs.editModal.edit(row, row.Status)
     },
     handleDelete(index, row) {
       this.$confirm('确认删除?(' + row.OutNo + ')')
