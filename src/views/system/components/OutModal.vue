@@ -41,7 +41,7 @@
       </el-col>
       <el-col :span="12">
         <el-form-item label="类型" prop="Status">
-          <el-select v-model="value.Status" style="width: 300px;">
+          <el-select v-model="modal.Status" style="width: 300px;">
             <el-option :value="0" label="普通出库" />
             <el-option :value="3" label="坏件寄厂维修" />
           </el-select>
@@ -171,7 +171,7 @@
             <el-option
               v-for="item in spuList"
               :key="item.Id"
-              :label="item.SkuName + '(' + (item.Tool===0?'配件':'工具') + ')'"
+              :label="item.SkuName + ' ' + item.Unit + ' ' + '(' + (item.Tool===0?'配件':'工具') + ')' + item.AttrList.map(_ => _.Value).join(' ')"
               :value="item.Id"
             />
           </el-select>

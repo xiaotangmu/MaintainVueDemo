@@ -49,8 +49,8 @@
               {{ scope.row.TotalPrice | toMoney }}
             </template>
             <template v-if="col.model === 'OutNo'">
-              <el-tag :type="scope.row.Status === 0 ? 'primary' :scope.row.Status === 1 ? 'warning': 'success'">
-                {{ scope.row.Status === 0 ? "未绑定" :scope.row.Status === 1 ? "未完成": "已完成" }}
+              <el-tag :type="scope.row.Status === 0 ? 'primary' :scope.row.Status === 1 ? 'warning': scope.row.Status === 2 ? 'success': 'danger'">
+                {{ scope.row.Status === 0 ? "未绑定" :scope.row.Status === 1 ? "未完成": scope.row.Status === 2 ? "已完成": "坏件" }}
               </el-tag>
               {{ scope.row.OutNo }}
             </template>
@@ -58,7 +58,7 @@
               {{ scope.row.OutDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
             </template>
             <template v-else-if="col.model === 'Status'">
-              {{ scope.row.Status === 0 ? "普通出库" : "坏件寄厂维修" }}
+              {{ scope.row.Status === 3 ? "坏件寄厂维修" : "普通出库" }}
             </template>
             <template v-else>
               {{ scope.row[col.model] }}
