@@ -31,7 +31,7 @@ export function delEntryBatch(data) {
 }
 export function updEntry(data) {
   return request({
-    url: url + '/Entry/Update',
+    url: url + '/Entry/UpdateMain',
     method: 'post',
     data
   })
@@ -39,6 +39,27 @@ export function updEntry(data) {
 export function remarkEntry(data) {
   return request({
     url: url + '/Entry/RemarkEntry',
+    method: 'post',
+    data
+  })
+}
+export function delSku(data) {
+  return request({
+    url: url + '/Entry/UpdateDeleteSku',
+    method: 'post',
+    data
+  })
+}
+export function updSku(data) {
+  return request({
+    url: url + '/Entry/UpdateSkuList',
+    method: 'post',
+    data
+  })
+}
+export function addSku(data) {
+  return request({
+    url: url + '/Entry/UpdateAddSkuList',
     method: 'post',
     data
   })

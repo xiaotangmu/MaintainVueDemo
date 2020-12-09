@@ -28,7 +28,7 @@
             <el-dropdown-item>首页</el-dropdown-item>
           </router-link>
           <el-dropdown-item @click.native="$refs.msgModal.visit">
-            <el-badge :value="ws_badge.user.warning.notRead" :hidden="ws_badge.user.warning === 0" :max="10">
+            <el-badge :value="ws_badge.user.warning.notRead" :hidden="ws_badge.user.warning.notRead === 0" :max="10">
               消息
             </el-badge>
           </el-dropdown-item>

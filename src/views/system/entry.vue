@@ -11,71 +11,18 @@
       />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
-          <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button @click="handleEdit(scope.$index, scope.row)">详情</el-button>
           <el-button
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
           >删除</el-button>
         </template>
       </el-table-column>
-
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <h4 style="margin: 0;">入库信息</h4>
-          <el-table
-            :data="props.row.skuList"
-            style="width: 100%"
-          >
-            <el-table-column
-              prop="SkuName"
-              label="名称"
-            />
-            <el-table-column
-              prop="Brand"
-              label="品牌"
-            />
-            <el-table-column
-              label="属性"
-            >
-              <template slot-scope="scope">
-                <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
-                  {{ i.AttrName }}
-                  {{ i.Value }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="数量"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="单价"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price | toMoney }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="总金额"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price * scope.row.TotalCount | toMoney }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="新旧"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Status === 0 ? "新" : "旧" }}
-              </template>
-            </el-table-column>
-          </el-table>
+      <el-table-column type="expand" label="备注">
+        <template slot-scope="scope">
+          {{ scope.row.Description }}
         </template>
       </el-table-column>
-
       <template v-for="col in column">
         <el-table-column
           :key="col.model"
@@ -84,39 +31,8 @@
           :prop="col.model"
         >
           <template slot-scope="scope">
-            <template v-if="col.model === 'TotalPrice'">
-              {{ scope.row.TotalPrice | toMoney }}
-            </template>
-            <template v-else-if="col.model === 'IsMaintain'">
-              <div v-if="scope.row.IsMaintain === 0">
-                <el-popover trigger="hover" placement="top">
-                  <p>供应商编号: {{ scope.row.SupplierId }}</p>
-                  <p>供应商: {{ scope.row.SupplierName }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag>供应商</el-tag>
-                  </div>
-                </el-popover>
-              </div>
-              <div v-else-if="scope.row.maintainShowModel === null">
-                <el-popover trigger="hover" placement="top">
-                  <p>对应维修单已删除</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag>供应商</el-tag>
-                  </div>
-                </el-popover>
-              </div>
-              <div v-else>
-                <el-popover trigger="hover" placement="top">
-                  <p>公司名: {{ scope.row.maintainShowModel.CompanyName }}</p>
-                  <p>车牌号: {{ scope.row.maintainShowModel.CarLicense }}</p>
-                  <p>类型: {{ scope.row.maintainShowModel.Type }}</p>
-                  <p>开始时间: {{ scope.row.maintainShowModel.StartDate | formatDate('yyyy-MM-dd hh:mm:ss') }}</p>
-                  <p>归还时间: {{ scope.row.maintainShowModel.ReturnDate | formatDate('yyyy-MM-dd hh:mm:ss') }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag>维修单</el-tag>
-                  </div>
-                </el-popover>
-              </div>
+            <template v-if="col.model === 'Type'">
+              {{ scope.row.Type === 0 ? '供应商' : scope.row.Type === 1 ? '维修单' : scope.row.Type === 2 ? '出库单坏件' : '维修完成回库' }}
             </template>
             <template v-else-if="col.model === 'EntryDate'">
               {{ scope.row.EntryDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
@@ -163,8 +79,7 @@ export default {
         { label: '总金额', model: 'TotalPrice' },
         { label: '入库时间', model: 'EntryDate' },
         { label: '批次', model: 'Batch' },
-        { label: '来源', model: 'IsMaintain' },
-        { label: '备注', model: 'Description' }
+        { label: '来源', model: 'Type' }
       ],
       size: 10,
       currentPage: 1,

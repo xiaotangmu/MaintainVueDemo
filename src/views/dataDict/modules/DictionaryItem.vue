@@ -8,24 +8,19 @@
       size="65%"
     >
       <h3 slot="title">字典项子项</h3>
-      <div style="padding: 0px 20px;">
+      <div style="padding: 0px 20px; overflow: auto; height: 100vh;">
         <el-button type="primary" @click="handleNew">新增</el-button>
         <el-table :data="tableData" stripe style="width: 100%">
-          <el-table-column
-            align="center"
-            label="字典項類型"
-            prop="dataType"
-          />
+          <el-table-column type="expand" label="描述">
+            <template slot-scope="scope">
+              {{ scope.row.description }}
+            </template>
+          </el-table-column>
           <el-table-column
             align="center"
             width="300"
             label="字典项名称"
             prop="name"
-          />
-          <el-table-column
-            align="center"
-            label="描述"
-            prop="description"
           />
           <el-table-column
             align="center"

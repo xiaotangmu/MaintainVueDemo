@@ -31,7 +31,7 @@ export function addMaintain(data) {
 }
 export function updInfo(data) {
   return request({
-    url: url + '/Maintain/UpdateMaintainNoRelation',
+    url: url + '/Maintain/UpdateMain',
     method: 'post',
     data
   })
@@ -39,6 +39,27 @@ export function updInfo(data) {
 export function updTool(data) {
   return request({
     url: url + '/Maintain/UpdateWithTool',
+    method: 'post',
+    data
+  })
+}
+export function confirm(data) {
+  return request({
+    url: url + '/Maintain/ConfirmSign',
+    method: 'post',
+    data
+  })
+}
+export function addOut(data) {
+  return request({
+    url: url + '/Maintain/UpdateAddOutList',
+    method: 'post',
+    data
+  })
+}
+export function delOut(data) {
+  return request({
+    url: url + '/Maintain/UpdateDeleteOutList',
     method: 'post',
     data
   })

@@ -3,7 +3,7 @@
     :title="type"
     :visible.sync="dialogVisible"
     :modal-append-to-body="false"
-    width="60%"
+    width="1100px"
     top="10px"
   >
     <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="100px">
@@ -43,25 +43,18 @@
                 />
               </el-form-item>
             </el-col>
-            <el-col v-if="disable" :span="8">
-              <el-button type="primary" style="float: right;" :loading="loading" @click="updInfo">
-                更新
-              </el-button>
-            </el-col>
           </el-row>
-        </el-collapse-item>
-        <el-collapse-item title="维修单信息" name="2">
           <el-card class="box-card" style="margin-bottom: 20px;">
             <div slot="header" class="clearfix">
               <el-col :span="12">
                 <el-form-item label="绑定预约单" style="margin-bottom: 0;" prop="IsAppointment">
                   <el-select v-model="modal.IsAppointment" :disabled="disable" style="width: 300px;">
-                    <el-option :value="0" label="不绑定" />
-                    <el-option :value="1" label="绑定" />
+                    <el-option :value="1" label="不绑定" />
+                    <el-option :value="0" label="绑定" />
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col v-if="modal.IsAppointment === 1" :span="12">
+              <el-col v-if="modal.IsAppointment === 0" :span="12">
                 <el-form-item label="维修预约单" style="margin-bottom: 0;" prop="AppointmentId">
                   <el-select v-model="modal.AppointmentId" :disabled="disable" style="width: 300px;">
                     <el-option v-for="i in appointmentList" :key="i.Id" :value="i.Id" :label="i.CarLicense" />
@@ -69,204 +62,192 @@
                 </el-form-item>
               </el-col>
             </div>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-form-item label="车牌号">
-                <el-input v-model="modal.AppointmentModel.CarLicense" :disabled="modal.IsAppointment === 1" />
+                <el-input v-model="modal.AppointmentModel.CarLicense" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-form-item label="车型">
-                <el-input v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 1" />
+                <el-input v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
-              <el-form-item label="描述">
-                <el-input v-model="modal.AppointmentModel.Description" :disabled="modal.IsAppointment === 1" />
+            <el-col :span="12">
+              <el-form-item label="公司">
+                <el-input v-model="modal.AppointmentModel.CompanyName" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-form-item label="联系人">
-                <el-input v-model="modal.AppointmentModel.Contact" :disabled="modal.IsAppointment === 1" />
+                <el-input v-model="modal.AppointmentModel.Contact" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-form-item label="联系电话">
-                <el-input v-model="modal.AppointmentModel.Phone" :disabled="modal.IsAppointment === 1" />
+                <el-input v-model="modal.AppointmentModel.Phone" :disabled="modal.IsAppointment === 0" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="问题描述">
+                <el-input v-model="modal.AppointmentModel.Description" type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
           </el-card>
+          <el-button v-if="disable" type="primary" style="float: right; margin-bottom: 10px;" :loading="loading" @click="updInfo">
+            更新
+          </el-button>
         </el-collapse-item>
-        <el-collapse-item title="出库信息" name="3">
-          <el-col :span="12" style="position: absolute; right: 10px; z-index: 1000;">
-            <el-form-item label="出库表">
-              <el-select v-model="outId" style="width: 200px;">
-                <el-option v-for="i in outList.filter(_ => !outIdList.map(i => i.OutId).includes(_.Id))" :key="i.Id" :value="i.Id" :label="i.OutNo" />
+        <el-collapse-item title="设备选择" name="2">
+          <el-tabs v-model="activeName">
+            <el-card class="box-card">
+              <el-select v-model="dictId" style="width: 200px; margin-bottom: 10px;">
+                <el-option v-for="i in dictList.filter(_ => !modal.ChooseDictList.map(i => i.DictCode).includes(_.Code))" :key="i.Code" :value="JSON.stringify(i)" :label="i.Text" />
               </el-select>
-              <el-button v-if="disable" type="primary" :loading="loading" @click="updByOut">
+              <!-- <el-button type="primary">查看</el-button> -->
+              <el-button type="primary" @click="addDictItem()">添加</el-button>
+              <el-button v-if="disable" type="primary" :loading="loading" @click="updDict">
                 更新
               </el-button>
-            </el-form-item>
-          </el-col>
+              <el-row v-for="i in dictList.filter(_ => modal.ChooseDictList.map(i => i.DictCode).includes(_.Code))" :key="i.DictCode" style="height: 40px; line-height: 40px; border-top: solid 1px #ccc;">
+                <el-col :span="4">
+                  <el-button type="danger" @click="delDictItem(i)">删除</el-button>
+                </el-col>
+                <el-col :span="20">
+                  {{ i.Text }}
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-tabs>
+        </el-collapse-item>
+        <el-collapse-item title="出库列表" name="3">
+          <el-card class="box-card">
+            <el-select v-model="outId" style="width: 200px; margin-bottom: 10px;">
+              <el-option v-for="i in outList.filter(_ => !modal.OutList.map(i => i.OutId).includes(_.Id))" :key="i.Id" :value="JSON.stringify(i)" :label="i.OutNo" />
+            </el-select>
+            <!-- <el-button type="primary">查看</el-button> -->
+            <el-button v-if="!disable" type="primary" @click="addOutItem()">添加</el-button>
+            <el-button v-else type="primary" :loading="loading" @click="addOutItemByServer()">添加</el-button>
+            <el-row style="height: 40px; line-height: 40px; border-top: solid 1px #ccc;">
+              <el-col :span="4">
+                操作
+              </el-col>
+              <el-col :span="20">
+                出库编号
+              </el-col>
+            </el-row>
+            <el-row v-for="i in modal.OutList" :key="i.OutId" style="height: 40px; line-height: 40px; border-top: solid 1px #ccc;">
+              <el-col :span="4">
+                <el-button v-if="!disable" type="danger" @click="delOutItem(i)">删除</el-button>
+                <el-button v-else type="danger" :loading="loading" @click="delOutItemByServer(i)">删除</el-button>
+              </el-col>
+              <el-col :span="20">
+                <el-tag type="primary">出库编号</el-tag>
+                {{ i.OutNo }}
+              </el-col>
+            </el-row>
+          </el-card>
+        </el-collapse-item>
+        <el-collapse-item v-if="disable" title="库存列表" name="4">
           <el-tabs v-model="activeName">
+            <el-tab-pane label="零件列表" name="part-tab">
+              <el-table
+                :data="modal.SkuList"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="SkuNo"
+                  label="库存编码"
+                />
+                <el-table-column
+                  prop="ProductName"
+                  label="名称"
+                />
+                <el-table-column
+                  prop="Brand"
+                  label="品牌"
+                />
+                <el-table-column
+                  label="属性"
+                >
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="Price"
+                  label="价格"
+                />
+              </el-table>
+            </el-tab-pane>
             <el-tab-pane label="工具列表" name="tool-tab">
-              <el-card class="box-card">
-                <el-button v-if="disable" type="primary" style="float: right;" :loading="loading" @click="updTool">
-                  更新
-                </el-button>
-                <el-table
-                  :data="modal.ToolList"
-                  style="width: 100%"
+              <el-table
+                :data="modal.ToolList"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="SkuNo"
+                  label="库存编码"
+                />
+                <el-table-column
+                  prop="ProductName"
+                  label="名称"
+                />
+                <el-table-column
+                  prop="Brand"
+                  label="品牌"
+                />
+                <el-table-column
+                  label="属性"
                 >
-                  <el-table-column
-                    prop="SkuName"
-                    label="名称"
-                  />
-                  <el-table-column
-                    label="属性"
-                  >
-                    <template slot-scope="scope">
-                      <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
-                        {{ i.AttrName }}
-                        {{ i.Value }}
-                      </el-tag>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="数量"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.Num + '(' + scope.row.Unit + ')' }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="赔偿金额"
-                    align="center"
-                    width="300px"
-                  >
-                    <template slot-scope="scope">
-                      <el-input-number v-model="scope.row.Compensation" :disabled="!disable" :precision="2" :step="1" />
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="归还数量"
-                    align="center"
-                    width="300px"
-                  >
-                    <template slot-scope="scope">
-                      <el-input-number v-model="scope.row.DealNum" :disabled="!disable" :step="1" :max="scope.row.Num" />
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="新旧"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.Status === 0 ? "新" : "旧" }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="Remark"
-                    label="备注"
-                  />
-                </el-table>
-              </el-card>
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="Price"
+                  label="价格"
+                />
+              </el-table>
             </el-tab-pane>
-            <el-tab-pane label="零件列表" name="old-part-tab">
-              <el-card class="box-card">
-                <el-table
-                  :data="modal.SkuList"
-                  style="width: 100%"
+            <!-- <el-tab-pane label="旧配件列表" name="old-part-tab">
+              <el-table
+                :data="modal.OldPartList"
+                style="width: 100%"
+              >
+                <el-table-column
+                  prop="SkuNo"
+                  label="库存编码"
+                />
+                <el-table-column
+                  prop="ProductName"
+                  label="名称"
+                />
+                <el-table-column
+                  prop="Brand"
+                  label="品牌"
+                />
+                <el-table-column
+                  label="属性"
                 >
-                  <el-table-column
-                    prop="SkuName"
-                    label="名称"
-                  />
-                  <el-table-column
-                    label="属性"
-                  >
-                    <template slot-scope="scope">
-                      <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
-                        {{ i.AttrName }}
-                        {{ i.Value }}
-                      </el-tag>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="Price"
-                    label="单价"
-                  />
-                  <el-table-column
-                    label="数量"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.Num + '(' + scope.row.Unit + ')' }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    label="新旧"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.Status === 0 ? "新" : "旧" }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="Remark"
-                    label="备注"
-                  />
-                </el-table>
-              </el-card>
-            </el-tab-pane>
-            <el-tab-pane label="旧配件列表" name="part-tab">
-              <el-card class="box-card">
-                <el-button type="primary" @click="newItem2">新增</el-button>
-                <el-button v-if="disable" type="primary" style="float: right;" :loading="loading" @click="updPart">
-                  更新
-                </el-button>
-                <el-table
-                  :data="modal.OldPartList"
-                  style="width: 100%"
-                >
-                  <el-table-column align="left" width="180px" label="操作">
-                    <template slot-scope="scope">
-                      <el-button :disabled="scope.row.disable" @click="handleEdit2(scope.$index, scope.row)">编辑</el-button>
-                      <el-button
-                        type="danger"
-                        :disabled="scope.row.disable"
-                        @click="handleDelete2(scope.$index)"
-                      >删除</el-button>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="SkuName"
-                    label="名称"
-                  />
-                  <el-table-column
-                    label="属性"
-                  >
-                    <template slot-scope="scope">
-                      <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
-                        {{ i.AttrName }}
-                        {{ i.Value }}
-                      </el-tag>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="Price"
-                    label="单价"
-                  />
-                  <el-table-column
-                    label="数量"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.Num + '(' + scope.row.Unit + ')' }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    prop="Remark"
-                    label="备注"
-                  />
-                </el-table>
-              </el-card>
-            </el-tab-pane>
+                  <template slot-scope="scope">
+                    <el-tag v-for="i in scope.row.AttrList.filter(i => i.AttrName)" :key="i.Id">
+                      {{ i.AttrName }}
+                      {{ i.Value }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="Price"
+                  label="价格"
+                />
+              </el-table>
+            </el-tab-pane> -->
           </el-tabs>
         </el-collapse-item>
       </el-collapse>
@@ -275,6 +256,7 @@
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancel">取 消</el-button>
       <el-button v-show="!disable" type="primary" :loading="loading" @click="submit">确 定</el-button>
+      <el-button v-if="disable" type="primary" :loading="loading" @click="confirmName">确认签名</el-button>
     </span>
 
     <el-dialog
@@ -339,24 +321,18 @@
   </el-dialog>
 </template>
 <script>
-import { getOutAll } from '@/api/system/out'
-import { addMaintain, updInfo, updTool, updPart, updByOut } from '@/api/system/maintain'
+import { getOutAllNoBind } from '@/api/system/out'
+import { addMaintain, updInfo, addOut, delOut, confirm } from '@/api/system/maintain'
 import { getAppointmentAll } from '@/api/system/appointment'
 import { getList, getListBy1 } from '@/api/category/catalog'
 import { getSkuList } from '@/api/system/sku'
+import { getChildrenByType, updDict } from '@/api/dataDict'
 export default {
   data() {
     return {
-      outIdList: [],
-      tool: {
-        initList: [],
-        asyncList: []
-      },
-      part: {
-        initList: [],
-        asyncList: []
-      },
-      activeNames: ['1'],
+      dictId: '',
+      dictList: [],
+      activeNames: [],
       maintainId: '',
       spuList: [],
       catalogList: [],
@@ -365,7 +341,7 @@ export default {
       Catalog2Id: '',
       outId: '',
       outList: [],
-      activeName: 'tool-tab',
+      activeName: 'part-tab',
       appointmentList: [],
       pickerOptions: {
         disabledDate(time) {
@@ -390,18 +366,10 @@ export default {
       type: '',
       modal: {
         AppointmentId: '',
-        ChooseDictList: [
-          {
-            DictId: ''
-          }
-        ],
-        OutList: [
-          {
-            OutId: ''
-          }
-        ],
+        ChooseDictList: [],
+        OutList: [],
         Staff: '',
-        IsAppointment: 0,
+        IsAppointment: 1,
         AppointmentModel: {
           CompanyName: '',
           CarLicense: '',
@@ -435,29 +403,9 @@ export default {
     },
     itemDisable() {
       return (this.valueTitle === '修改配件信息')
-    },
-    allTool() {
-      return this.tool.initList.concat(this.tool.asyncList)
-    },
-    allPart() {
-      return this.part.initList.concat(this.part.asyncList)
     }
   },
   watch: {
-    allTool: {
-      handler(val) {
-        this.modal.ToolList = this.tool.initList.concat(this.tool.asyncList)
-      },
-      immediate: true,
-      deep: true
-    },
-    allPart: {
-      handler(val) {
-        this.modal.SkuList = this.part.initList.concat(this.part.asyncList)
-      },
-      immediate: true,
-      deep: true
-    },
     catalog1Id(val) {
       this.Catalog2Id = ''
       if (!val) {
@@ -493,44 +441,6 @@ export default {
       this.value.Unit = this.spuList[index].Unit
       this.value.AttrList = this.spuList[index].AttrList
     },
-    outId(val) {
-      const index = this.outList.findIndex(i => i.Id === val)
-      if (index > -1) {
-        this.modal.OutList = this.outIdList.concat([{ OutId: this.outList[index].Id }])
-        this.tool.asyncList = this.outList[index].skuList.filter(i => i.Tool === 1).map(i => {
-          return {
-            Price: i.Price,
-            SkuName: i.SkuName,
-            Brand: i.Brand,
-            Unit: i.Unit,
-            AttrList: i.AttrList,
-            Id: i.Id,
-            Remark: i.Description,
-            OutSkuId: i.Id,
-            Num: i.TotalCount,
-            DealNum: 0,
-            Status: i.AddressModel.Status,
-            Compensation: 0
-          }
-        })
-        this.part.asyncList = this.outList[index].skuList.filter(i => i.Tool === 0).map(i => {
-          return {
-            SkuName: i.SkuName,
-            Brand: i.Brand,
-            Unit: i.Unit,
-            AttrList: i.AttrList,
-            Id: i.Id,
-            Price: i.Price,
-            Remark: i.Description,
-            SkuId: i.SkuId,
-            Num: i.TotalCount,
-            DealNum: 0,
-            Status: i.AddressModel.Status,
-            disable: true
-          }
-        })
-      }
-    },
     'modal.AppointmentId'(val) {
       if (!val) {
         return
@@ -542,17 +452,124 @@ export default {
     }
   },
   created() {
-    getList().then(res => {
-      this.options = res.data
-    })
+    this.getOutList()
     getAppointmentAll().then(res => {
       this.appointmentList = res.data
     })
-    getOutAll().then(res => {
-      this.outList = res.data
+    getList().then(res => {
+      this.options = res.data
+    })
+    getChildrenByType({ TypeCode: 'Equipment' }).then(res => {
+      this.dictList = res.data
     })
   },
   methods: {
+    confirmName() {
+      console.log(this.modal)
+      this.$confirm('确认签名？').then(() => {
+        confirm({
+          MaintainId: this.modal.MaintainId,
+          MaintainNo: this.modal.MaintainNo
+        }).then(() => {
+          this.success()
+        })
+      })
+    },
+    getOutList() {
+      getOutAllNoBind().then(res => {
+        this.outList = res.data
+      })
+    },
+    updDict() {
+      this.loading = true
+      updDict({
+        ChooseDictList: this.modal.ChooseDictList,
+        MaintainId: this.modal.MaintainId,
+        MaintainNo: this.modal.MaintainNo
+      }).then(res => {
+        this.$emit('handleSuccess')
+        this.success()
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    addDictItem() {
+      const row = JSON.parse(this.dictId)
+      this.modal.ChooseDictList.push({ DictCode: row.Code, Text: row.Text })
+      this.dictId = ''
+    },
+    delDictItem(i) {
+      const index = this.modal.ChooseDictList.findIndex(_ => _.DictCode === i.Code)
+      this.modal.ChooseDictList.splice(index, 1)
+    },
+    addOutItemByServer() {
+      this.loading = true
+      const row = JSON.parse(this.outId)
+      addOut({
+        OutList: [
+          {
+            OutId: row.Id
+          }
+        ],
+        MaintainId: this.modal.MaintainId,
+        MaintainNo: this.modal.MaintainNo
+      }).then(res => {
+        this.$emit('handleSuccess')
+        this.success()
+        this.loading = false
+        this.modal = res.data
+        // this.modal.OutList.push({ OutId: row.Id, OutNo: row.OutNo })
+        this.outId = ''
+        this.getOutList()
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    delOutItemByServer(row) {
+      this.$confirm('确认删除?(' + row.OutNo	 + ')')
+        .then(() => {
+          delOut({
+            OutList: [
+              {
+                OutId: row.OutId
+              }
+            ],
+            MaintainId: this.modal.MaintainId,
+            MaintainNo: this.modal.MaintainNo
+          }).then(res => {
+            this.$emit('handleSuccess')
+            this.success()
+            this.loading = false
+            this.modal = res.data
+            this.getOutList()
+            // const index = this.modal.OutList.findIndex(_ => _.OutId === row.OutId)
+            // this.modal.OutList.splice(index, 1)
+          }).catch(() => {
+            this.loading = false
+          })
+        })
+        .catch(() => {})
+    },
+    addOutItem() {
+      const row = JSON.parse(this.outId)
+      this.modal.OutList.push({ OutId: row.Id, OutNo: row.OutNo })
+      this.outId = ''
+    },
+    delOutItem(i) {
+      const index = this.modal.OutList.findIndex(_ => _.OutId === i.OutId)
+      this.modal.OutList.splice(index, 1)
+    },
+    updInfo() {
+      this.loading = true
+      updInfo(this.modal).then(() => {
+        this.$emit('handleSuccess')
+        this.success()
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
     handleEdit2(index, row) {
       this.addrIndex = index
       this.value = JSON.parse(JSON.stringify(row))
@@ -598,46 +615,6 @@ export default {
         })
         .catch(() => {})
     },
-    updInfo() {
-      this.loading = true
-      updInfo(this.modal).then(() => {
-        this.$emit('handleSuccess')
-        this.success()
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
-    },
-    updTool() {
-      this.loading = true
-      updTool(this.modal).then(() => {
-        this.$emit('handleSuccess')
-        this.success()
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
-    },
-    updByOut() {
-      this.loading = true
-      updByOut(this.modal).then(() => {
-        this.$emit('handleSuccess')
-        this.success()
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
-    },
-    updPart() {
-      this.loading = true
-      updPart(this.modal).then(() => {
-        this.$emit('handleSuccess')
-        this.success()
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
-      })
-    },
     submit() {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
@@ -659,30 +636,15 @@ export default {
       this.dialogVisible = false
     },
     add() {
-      this.outIdList = []
       this.type = '新增'
       this.dialogVisible = true
-      this.activeNames = ['1', '2']
-      this.outId = ''
-      this.maintainId = ''
-      this.tool.initList = []
-      this.tool.asyncList = []
-      this.part.initList = []
-      this.part.asyncList = []
+      this.activeNames = ['1']
       this.modal = {
         AppointmentId: '',
-        ChooseDictList: [
-          {
-            DictId: ''
-          }
-        ],
-        OutList: [
-          {
-            OutId: ''
-          }
-        ],
+        ChooseDictList: [],
+        OutList: [],
         Staff: '',
-        IsAppointment: 0,
+        IsAppointment: 1,
         AppointmentModel: {
           CompanyName: '',
           CarLicense: '',
@@ -697,29 +659,11 @@ export default {
       }
     },
     edit(row) {
-      this.activeNames = ['1', '3']
+      this.activeNames = ['1']
       const obj = JSON.parse(JSON.stringify(row))
       this.type = '编辑'
       this.dialogVisible = true
       this.modal = obj
-      this.maintainId = obj.Id
-      this.tool.asyncList = []
-      this.part.asyncList = []
-      this.outIdList = obj.OutList
-      this.tool.initList = this.modal.ToolList.map(i => {
-        i.MaintainId = this.maintainId
-        return i
-      })
-      this.part.initList = this.modal.SkuList.map(i => {
-        i.MaintainId = this.maintainId
-        i.Num = i.TotalCount
-        return i
-      })
-      this.modal.OldPartList = this.modal.OldPartList.map(i => {
-        i.MaintainId = this.maintainId
-        return i
-      })
-      this.outId = ''
     },
     success() {
       this.$message({

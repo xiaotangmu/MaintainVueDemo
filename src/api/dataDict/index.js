@@ -15,9 +15,23 @@ export function getChildren(params) {
     params
   })
 }
+export function getChildrenByType(params) {
+  return request({
+    url: url + '/DataDict/GetChildrenByTypeCode',
+    method: 'get',
+    params
+  })
+}
 export function update(data) {
   return request({
     url: url + '/DataDict/Update',
+    method: 'post',
+    data
+  })
+}
+export function updDict(data) {
+  return request({
+    url: url + '/Maintain/UpdateChooseList',
     method: 'post',
     data
   })

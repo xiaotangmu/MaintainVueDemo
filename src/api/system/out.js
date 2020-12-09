@@ -15,6 +15,20 @@ export function getOutAll(params) {
     params
   })
 }
+export function getBad(params) {
+  return request({
+    url: url + '/Out/GetBadSkuWithOutAll',
+    method: 'get',
+    params
+  })
+}
+export function getOutAllNoBind(params) {
+  return request({
+    url: url + '/Out/GetAllNoBind',
+    method: 'get',
+    params
+  })
+}
 export function addOut(data) {
   return request({
     url: url + '/Out/Add',

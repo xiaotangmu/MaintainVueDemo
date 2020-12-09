@@ -15,13 +15,13 @@
       </el-form-item>
       <el-form-item label="字典项编码">
         <el-input
-          v-model="name"
+          v-model="code"
           placeholder="字典项编码"
         />
       </el-form-item>
       <el-form-item label="字典项名称">
         <el-input
-          v-model="code"
+          v-model="name"
           placeholder="字典项名称"
         />
       </el-form-item>

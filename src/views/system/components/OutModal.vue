@@ -3,7 +3,7 @@
     :title="type"
     :visible.sync="dialogVisible"
     :modal-append-to-body="false"
-    width="60%"
+    width="1100px"
   >
     <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="100px">
       <el-col :span="12">
@@ -67,7 +67,7 @@
             type="selection"
             width="55"
           />
-          <el-table-column align="left" label="操作">
+          <el-table-column align="left" label="操作" width="180">
             <template slot-scope="scope">
               <el-button
                 v-if="!disable"
@@ -86,10 +86,9 @@
               >更新</el-button>
             </template>
           </el-table-column>
-          <el-table-column type="expand">
+          <el-table-column type="expand" label="备注">
             <template slot-scope="scope">
-              <el-tag>备注</el-tag>
-              {{ scope.row.Remark }}
+              {{ scope.row.Remark ? scope.row.Remark : "无" }}
             </template>
           </el-table-column>
           <el-table-column
@@ -107,7 +106,7 @@
             label="损坏状态"
           >
             <template slot-scope="scope">
-              {{ scope.row.Status === 0 ? "正常" : scope.row.Status === 1 ? "待回收" : scope.row.Status === 2 ? "已回收" : "已丢弃" }}
+              {{ scope.row.IsBad === 0 ? "正常" : scope.row.IsBad === 1 ? "坏件，待回收" : scope.row.IsBad === 2 ? "已回收" : "已丢弃" }}
             </template>
           </el-table-column>
           <el-table-column
@@ -169,7 +168,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="位置" prop="AddressId">
+        <el-form-item label="库存编号" prop="AddressId">
           <el-select v-model="value.AddressId" :disabled="itemDisable" placeholder="请选择" style="width: 300px;">
             <!-- '房间'+item.Room+ '  货架'+ item.Self + '(' + (item.Status===0?'新':'旧') + ')' -->
             <el-option
@@ -283,7 +282,7 @@
         <el-form-item label="损坏状态">
           <el-select v-model="updModal.IsBad" placeholder="请选择" style="width: 300px;">
             <el-option label="正常" :value="0" />
-            <el-option label="待回收" :value="1" />
+            <el-option label="坏件，待回收" :value="1" />
             <el-option label="已回收" :value="2" />
             <el-option label="已丢弃" :value="3" />
           </el-select>
@@ -457,7 +456,7 @@ export default {
   },
   methods: {
     updItems() {
-      this.$confirm('确认添加?')
+      this.$confirm('确认修改?')
         .then(() => {
           updItems({
             OutSkuList: [
@@ -470,6 +469,7 @@ export default {
             OutId: this.modal.Id,
             OutNo: this.modal.OutNo
           }).then(() => {
+            this.success()
             const index = this.modal.outSkuList.findIndex(_ => _.SkuNo === this.updModal.SkuNo)
             this.modal.outSkuList.splice(index, 1, this.updModal)
             this.updVisible = false

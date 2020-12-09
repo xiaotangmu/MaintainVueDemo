@@ -31,15 +31,15 @@
       />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
-          <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button @click="handleEdit(scope.$index, scope.row)">详情</el-button>
           <el-button
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
           >删除</el-button>
         </template>
       </el-table-column>
-
-      <el-table-column type="expand">
+      <!--
+      <el-table-column type="expand" label="库存">
         <template slot-scope="props">
           <el-tabs v-model="activeName">
             <el-tab-pane label="旧配件表" name="first">
@@ -185,7 +185,7 @@
             </el-tab-pane>
           </el-tabs>
         </template>
-      </el-table-column>
+      </el-table-column> -->
 
       <template v-for="col in column">
         <el-table-column
@@ -268,7 +268,7 @@ export default {
         .then(() => {
           delMaintainBatch(this.multipleSelection.map(i => {
             return {
-              Id: i.Id,
+              Id: i.MaintainId,
               MaintainNo: i.MaintainNo
             }
           })).then(() => {
@@ -309,7 +309,7 @@ export default {
     handleDelete(index, row) {
       this.$confirm('确认删除?(' + row.MaintainNo	 + ')')
         .then(() => {
-          delMaintain({ Id: row.Id, MaintainNo: row.MaintainNo	 }).then(() => {
+          delMaintain({ Id: row.MaintainId, MaintainNo: row.MaintainNo	 }).then(() => {
             this.tableData.splice(index, 1)
             this.success()
           })

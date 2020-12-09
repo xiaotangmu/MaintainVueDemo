@@ -32,65 +32,6 @@
           >删除</el-button>
         </template>
       </el-table-column>
-
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <h4 style="margin: 0;">库存信息</h4>
-          <el-table
-            :data="props.row.skuList"
-            style="width: 100%"
-          >
-            <el-table-column
-              prop="SkuName"
-              label="库存名"
-            />
-            <el-table-column
-              prop="Brand"
-              label="品牌"
-            />
-            <el-table-column
-              prop="Alarm"
-              label="警报值"
-            />
-            <el-table-column
-              label="配件/工具"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Tool === 0 ? "配件" : "工具" }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="属性"
-            >
-              <template slot-scope="scope">
-                <el-tag v-for="i in scope.row.AttrList" :key="i.Id">
-                  {{ i.AttrName }}
-                  {{ i.Value }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="Description"
-              label="备注"
-            />
-            <el-table-column
-              label="单价"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.Price | toMoney }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="数量"
-            >
-              <template slot-scope="scope">
-                {{ scope.row.TotalCount + '(' + scope.row.Unit + ')' }}
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>
-
       <template v-for="col in column">
         <el-table-column
           :key="col.model"
@@ -192,6 +133,8 @@ export default {
     },
     getList() {
       getOutList(delEmpty({
+        HasBad: -1,
+        Status: -1,
         PageIndex: this.currentPage,
         PageSize: this.size,
         SearchStr: this.search.SearchStr,

@@ -86,7 +86,6 @@ export default {
     return {
       column: [
         { model: 'typeCode', label: '类型编码' },
-        { model: 'dataType', label: '字典项类型' },
         { model: 'code', label: '字典项编码' },
         { model: 'name', label: '字典项名称' },
         { model: 'sort', label: '排序' },
