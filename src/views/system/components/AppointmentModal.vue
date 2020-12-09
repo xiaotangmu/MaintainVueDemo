@@ -8,8 +8,8 @@
     <el-form ref="ruleForm" :model="modal" :rules="rule" label-width="80px">
       <el-row>
         <el-col :span="12">
-          <el-form-item label="所属公司" prop="CompanyId">
-            <el-input v-model="modal.CompanyId" />
+          <el-form-item label="所属公司" prop="CompanyName">
+            <el-input v-model="modal.CompanyName" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -75,7 +75,7 @@ export default {
       dialogVisible: false,
       type: '',
       modal: {
-        CompanyId: '',
+        CompanyName: '',
         CarLicense: '',
         Description: '',
         AppointmentDate: '',
@@ -87,7 +87,7 @@ export default {
       },
       loading: false,
       rule: {
-        CompanyId: [{ required: true, message: '请选择公司', trigger: 'blur' }],
+        CompanyName: [{ required: true, message: '请选择公司', trigger: 'blur' }],
         CarLicense: [{ required: true, message: '请输入车牌号', trigger: 'blur' }],
         Description: [{ required: true, message: '请输入问题描述', trigger: 'blur' }],
         AppointmentDate: [{ required: true, message: '请选择预约时间', trigger: 'blur' }],

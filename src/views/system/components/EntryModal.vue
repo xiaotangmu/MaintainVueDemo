@@ -55,9 +55,9 @@
               <el-form-item label="入库时间" prop="EntryDate">
                 <el-date-picker
                   v-model="modal.EntryDate"
-                  type="datetime"
+                  type="date"
                   placeholder="选择日期时间"
-                  format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd"
                   style="width: 100%;"
                   :picker-options="pickerOptions"
                 />
@@ -190,7 +190,7 @@
             <el-option
               v-for="item in spuList"
               :key="item.Id"
-              :label="item.SkuName + '(' + (item.Tool===0?'配件':'工具') + ')'"
+              :label="item.SkuName + ' ' + item.Unit + ' ' + '(' + (item.Tool===0?'配件':'工具') + ')' + item.AttrList.map(_ => _.Value).join(' ')"
               :value="item.Id"
             />
           </el-select>

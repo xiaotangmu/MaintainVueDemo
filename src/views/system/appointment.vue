@@ -93,7 +93,7 @@ export default {
         Status: -1
       },
       column: [
-        { label: '所属公司', model: 'CompanyId' },
+        { label: '所属公司', model: 'CompanyName' },
         { label: '车牌号码', model: 'CarLicense' },
         { label: '问题描述', model: 'Description' },
         { label: '预约时间', model: 'AppointmentDate' },

@@ -30,10 +30,10 @@
         <el-form-item label="出库时间" prop="OutDate">
           <el-date-picker
             v-model="modal.OutDate"
-            type="datetime"
+            type="date"
             placeholder="选择日期时间"
-            format="yyyy-MM-dd HH:mm:ss"
-            value-format="yyyy-MM-dd HH:mm:ss"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
             style="width: 100%;"
             :picker-options="pickerOptions"
           />
