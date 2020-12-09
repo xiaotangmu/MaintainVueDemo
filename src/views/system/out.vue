@@ -32,6 +32,11 @@
           >删除</el-button>
         </template>
       </el-table-column>
+      <el-table-column type="expand" label="备注">
+        <template slot-scope="scope">
+          {{ scope.row.Description }}
+        </template>
+      </el-table-column>
       <template v-for="col in column">
         <el-table-column
           :key="col.model"
@@ -51,6 +56,9 @@
             </template>
             <template v-else-if="col.model === 'OutDate'">
               {{ scope.row.OutDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
+            </template>
+            <template v-else-if="col.model === 'Status'">
+              {{ scope.row.Status === 0 ? "普通出库" : "坏件寄厂维修" }}
             </template>
             <template v-else>
               {{ scope.row[col.model] }}
@@ -97,7 +105,8 @@ export default {
         { label: '出库时间', model: 'OutDate' },
         { label: '批次', model: 'Batch' },
         { label: '客户', model: 'ClientName' },
-        { label: '备注', model: 'Description' }
+        { label: '类型', model: 'Status' }
+
       ],
       size: 10,
       currentPage: 1,

@@ -40,6 +40,14 @@
         </el-form-item>
       </el-col>
       <el-col :span="12">
+        <el-form-item label="类型" prop="Status">
+          <el-select v-model="value.Status" style="width: 300px;">
+            <el-option :value="0" label="普通出库" />
+            <el-option :value="3" label="坏件寄厂维修" />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
         <el-form-item label="总金额">
           <el-input-number v-model="modal.TotalPrice" disabled :precision="2" :step="1" />
         </el-form-item>
@@ -343,6 +351,7 @@ export default {
       dialogVisible: false,
       type: '',
       modal: {
+        Status: 0,
         OutNo: '',
         Operator: '',
         TotalPrice: '',
@@ -623,6 +632,7 @@ export default {
       this.type = '新增'
       this.dialogVisible = true
       this.modal = {
+        Status: 0,
         OutNo: '',
         Operator: '',
         TotalPrice: '',
