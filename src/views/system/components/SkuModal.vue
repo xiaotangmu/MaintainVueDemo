@@ -199,6 +199,8 @@
 import { getById, getAttrList } from '@/api/system/product'
 import { addSku, updSku } from '@/api/system/sku'
 import { getList, getListBy1 } from '@/api/category/catalog'
+import { success } from '@/api/common/message'
+
 export default {
   data() {
     return {
@@ -366,7 +368,7 @@ export default {
           this.loading = true
           if (this.type === '新增') {
             addSku(this.modal).then(() => {
-              this.success()
+              success(this)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -375,7 +377,7 @@ export default {
             })
           } else {
             updSku(this.modal).then(() => {
-              this.success()
+              success(this)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -414,12 +416,6 @@ export default {
           SpuAttrValueId: _.SpuAttrValueId,
           Value: _.Value
         })
-      })
-    },
-    success() {
-      this.$message({
-        type: 'success',
-        message: '操作成功'
       })
     }
   }

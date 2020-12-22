@@ -31,7 +31,14 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="车型" prop="Type">
-            <el-input v-model="modal.Type" />
+            <el-select v-model="modal.Type" filterable clearable placeholder="请选择">
+              <el-option
+                v-for="item in carTypeList"
+                :key="item.Text"
+                :label="item.Text"
+                :value="item.Text">
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -48,7 +55,7 @@
           <el-form-item label="状态" prop="Status">
             <el-select v-model="modal.Status" style="width: 100%;">
               <el-option :value="0" disabled label="未处理" />
-              <el-option :value="1" disabled -label="已处理" />
+              <el-option :value="1" disabled label="已处理" />
               <el-option :value="2" label="取消" />
               <el-option :value="3" disabled label="维修中" />
             </el-select>
@@ -71,6 +78,8 @@
 
 <script>
 import { addAppointment, updAppointment } from '@/api/system/appointment'
+import { getCarType } from '@/api/dataDict/dictList'
+import { messageAndSetTime, success } from '@/api/common/message'
 export default {
   data() {
     return {
@@ -94,8 +103,15 @@ export default {
         AppointmentDate: [{ required: true, message: '请选择预约时间', trigger: 'blur' }],
         Contact: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
         Phone: [{ required: true, message: '请输入联系电话', trigger: 'blur' }]
-      }
+      },
+      carTypeList: []
     }
+  },
+  mounted() {
+    // 获取车型
+    getCarType().then((res) => {
+      this.carTypeList = res.data
+    })
   },
   computed: {
     disable() {
@@ -109,8 +125,8 @@ export default {
         if (valid) {
           this.loading = true
           if (this.type === '新增') {
-            addAppointment(this.modal).then(() => {
-              this.success()
+            addAppointment(this.modal).then((res) => {
+              messageAndSetTime(this, '成功添加，单号为：' + res.data, 5000)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -119,7 +135,7 @@ export default {
             })
           } else {
             updAppointment(this.modal).then(() => {
-              this.success()
+              success(this)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -152,12 +168,6 @@ export default {
       this.type = '编辑'
       this.dialogVisible = true
       this.modal = obj
-    },
-    success() {
-      this.$message({
-        type: 'success',
-        message: '操作成功'
-      })
     }
   }
 }

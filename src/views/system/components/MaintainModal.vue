@@ -11,6 +11,11 @@
         <el-collapse-item title="基本信息" name="1">
           <el-row>
             <el-col :span="8">
+              <el-form-item v-if="type==='编辑'" label="维修单号" prop="MaintainNo">
+                <label>{{modal.MaintainNo?modal.MaintainNo:''}}</label>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
               <el-form-item label="维修员工" prop="Staff">
                 <el-input v-model="modal.Staff" />
               </el-form-item>
@@ -73,7 +78,15 @@
             <el-col :span="12">
               <el-form-item label="车型">
                 <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.Type }}</span>
-                <el-input v-else v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" />
+                <el-select v-else v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" filterable clearable placeholder="请选择">
+                  <el-option
+                    v-for="item in carTypeList"
+                    :key="item.Text"
+                    :label="item.Text"
+                    :value="item.Text">
+                  </el-option>
+                </el-select>
+<!--                <el-input v-else v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" />-->
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -111,6 +124,7 @@
               <el-select v-model="dictId" style="width: 200px; margin-bottom: 10px;">
                 <el-option v-for="i in dictList.filter(_ => !modal.ChooseDictList.map(i => i.DictCode).includes(_.Code))" :key="i.Code" :value="JSON.stringify(i)" :label="i.Text" />
               </el-select>
+
               <!-- <el-button type="primary">查看</el-button> -->
               <el-button type="primary" @click="addDictItem()">添加</el-button>
               <el-button v-if="disable" type="primary" :loading="loading" @click="updDict">
@@ -360,7 +374,10 @@ import { addMaintain, updInfo, addOut, delOut, confirm, udpateSkuToBad } from '@
 import { getAppointmentList } from '@/api/system/appointment'
 import { getList, getListBy1 } from '@/api/category/catalog'
 import { getSkuList } from '@/api/system/sku'
-import { getChildrenByType, updDict } from '@/api/dataDict'
+import { updDict } from '@/api/dataDict'
+import { getCarType, getEquipmentList } from '@/api/dataDict/dictList'
+import { messageAndSetTime, success } from '@/api/common/message'
+
 export default {
   data() {
     return {
@@ -437,8 +454,16 @@ export default {
         Operator: [{ required: true, message: '请输入负责人', trigger: 'blur' }]
       },
       valueTitle: '',
-      addrIndex: ''
+      addrIndex: '',
+      carTypeList: []
     }
+  },
+  mounted() {
+    // 获取车型
+    getCarType().then((res) => {
+      this.carTypeList = res.data
+    })
+    this.getOutList()
   },
   computed: {
     disable() {
@@ -495,15 +520,13 @@ export default {
     }
   },
   created() {
-    this.getOutList()
     getAppointmentList({ PageIndex: 1, PageSize: 200, Status: 0 }).then(res => {
-      console.log(res.data)
       this.appointmentList = res.data.Items
     })
     getList().then(res => {
       this.options = res.data
     })
-    getChildrenByType({ TypeCode: 'Equipment' }).then(res => {
+    getEquipmentList().then(res => {
       this.dictList = res.data
     })
   },
@@ -526,7 +549,7 @@ export default {
           MaintainId: this.modal.MaintainId,
           MaintainNo: this.modal.MaintainNo
         }).then(() => {
-          this.success()
+          success(this)
         })
       }).catch(() => {
         this.$message({
@@ -552,7 +575,7 @@ export default {
           MaintainId: this.modal.MaintainId,
           MaintainNo: this.modal.MaintainNo
         }).then(() => {
-          this.success()
+          success(this)
         }).catch((res) => {
           this.$message.error(res)
         })
@@ -571,7 +594,7 @@ export default {
         MaintainNo: this.modal.MaintainNo
       }).then(res => {
         this.$emit('handleSuccess')
-        this.success()
+        success(this)
         this.loading = false
       }).catch(() => {
         this.loading = false
@@ -599,7 +622,7 @@ export default {
         MaintainNo: this.modal.MaintainNo
       }).then(res => {
         this.$emit('handleSuccess')
-        this.success()
+        success(this)
         this.loading = false
         this.modal = res.data
         // this.modal.OutList.push({ OutId: row.Id, OutNo: row.OutNo })
@@ -622,7 +645,7 @@ export default {
             MaintainNo: this.modal.MaintainNo
           }).then(res => {
             this.$emit('handleSuccess')
-            this.success()
+            success(this)
             this.loading = false
             this.modal = res.data
             this.getOutList()
@@ -647,7 +670,7 @@ export default {
       this.loading = true
       updInfo(this.modal).then(() => {
         this.$emit('handleSuccess')
-        this.success()
+        success(this)
         this.loading = false
       }).catch(() => {
         this.loading = false
@@ -703,8 +726,8 @@ export default {
         if (valid) {
           this.loading = true
           if (this.type === '新增') {
-            addMaintain(this.modal).then(() => {
-              this.success()
+            addMaintain(this.modal).then((res) => {
+              messageAndSetTime(this, '成功添加，单号为：' + res.data, 5000)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -747,12 +770,6 @@ export default {
       this.type = '编辑'
       this.dialogVisible = true
       this.modal = obj
-    },
-    success() {
-      this.$message({
-        type: 'success',
-        message: '操作成功'
-      })
     }
   }
 }

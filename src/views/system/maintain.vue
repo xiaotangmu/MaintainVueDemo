@@ -213,10 +213,10 @@
               </el-tag>
             </template>
             <template v-else-if="col.model === 'StartDate'">
-              {{ scope.row.StartDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
+              {{ scope.row.StartDate}}
             </template>
             <template v-else-if="col.model === 'ReturnDate'">
-              {{ scope.row.ReturnDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
+              {{ scope.row.ReturnDate}}
             </template>
             <template v-else>
               {{ scope.row[col.model] }}

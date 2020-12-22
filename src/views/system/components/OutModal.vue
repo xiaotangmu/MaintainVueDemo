@@ -325,6 +325,7 @@
 import { getSkuList } from '@/api/system/sku'
 import { addOut, delItems, addItems, updItems } from '@/api/system/out'
 import { getList, getListBy1 } from '@/api/category/catalog'
+import { messageAndSetTime } from '@/api/common/message'
 export default {
   data() {
     return {
@@ -627,8 +628,8 @@ export default {
         if (valid) {
           this.loading = true
           if (this.type === '新增') {
-            addOut(this.modal).then(() => {
-              this.success()
+            addOut(this.modal).then((res) => {
+              messageAndSetTime(this, '成功添加，单号为：' + res.data, 5000)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false

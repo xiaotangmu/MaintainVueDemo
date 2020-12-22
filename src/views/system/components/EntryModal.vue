@@ -242,6 +242,7 @@ import { addEntry, updEntry, delSku, updSku, addSku } from '@/api/system/entry'
 import { getMaintainAll } from '@/api/system/maintain'
 import { getList, getListBy1 } from '@/api/category/catalog'
 import { getBad } from '@/api/system/out'
+import { messageAndSetTime } from '@/api/common/message'
 export default {
   data() {
     return {
@@ -537,8 +538,8 @@ export default {
           this.loading = true
           const obj = JSON.parse(JSON.stringify(this.modal))
           if (this.type === '新增') {
-            addEntry(obj).then(() => {
-              this.success()
+            addEntry(obj).then((res) => {
+              messageAndSetTime(this, '成功添加，单号为：' + res.data, 5000)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false

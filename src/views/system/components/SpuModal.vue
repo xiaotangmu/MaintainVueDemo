@@ -104,6 +104,7 @@
 import { addSpu, updSpu } from '@/api/system/product'
 import { getAttrList } from '@/api/category/attr'
 import { getList, getListBy1 } from '@/api/category/catalog'
+import { success } from '@/api/common/message'
 export default {
   data() {
     return {
@@ -206,7 +207,7 @@ export default {
           this.loading = true
           if (this.type === '新增') {
             addSpu(this.spu).then(() => {
-              this.success()
+              success(this)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -215,7 +216,7 @@ export default {
             })
           } else {
             updSpu(this.spu).then(() => {
-              this.success()
+              success(this)
               this.$emit('handleSuccess')
               this.loading = false
               this.dialogVisible = false
@@ -241,12 +242,6 @@ export default {
       this.type = '编辑'
       this.dialogVisible = true
       this.spu = obj
-    },
-    success() {
-      this.$message({
-        type: 'success',
-        message: '操作成功'
-      })
     }
   }
 }
