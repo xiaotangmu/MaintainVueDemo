@@ -56,7 +56,7 @@
             <el-select v-model="modal.Status" style="width: 100%;">
               <el-option :value="0" disabled label="未处理" />
               <el-option :value="1" disabled label="已处理" />
-              <el-option :value="2" label="取消" />
+              <el-option :value="2" :disabled="modal.Status !== 0 " label="取消" />
               <el-option :value="3" disabled label="维修中" />
             </el-select>
           </el-form-item>

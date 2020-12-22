@@ -47,6 +47,20 @@
 
       <template v-for="col in column">
         <el-table-column
+          v-if="col.model !== 'Status' "
+          :key="col.model"
+          :align="col.align || 'center'"
+          :label="col.label"
+          :prop="col.model"
+        >
+          <template slot-scope="scope">
+            <template>
+              {{ scope.row[col.model] }}
+            </template>
+          </template>
+        </el-table-column>
+        <el-table-column
+          v-else
           :key="col.model"
           :align="col.align || 'center'"
           :label="col.label"
