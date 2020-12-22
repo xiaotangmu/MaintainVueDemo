@@ -1,1 +1,1 @@
-export const url = '/proxy'
+export const url = ''

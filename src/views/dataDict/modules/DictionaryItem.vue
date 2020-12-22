@@ -7,7 +7,7 @@
       :modal-append-to-body="false"
       size="65%"
     >
-      <h3 slot="title">字典项子项</h3>
+      <h3 slot="title">{{ name }}字典</h3>
       <div style="padding: 0px 20px; overflow: auto; height: 100vh;">
         <el-button type="primary" @click="handleNew">新增</el-button>
         <el-table :data="tableData" stripe style="width: 100%">
@@ -16,6 +16,11 @@
               {{ scope.row.description }}
             </template>
           </el-table-column>
+          <el-table-column
+            align="center"
+            label="字典编码"
+            prop="code"
+          />
           <el-table-column
             align="center"
             width="300"
@@ -86,6 +91,7 @@ export default {
   },
   data() {
     return {
+      name: '',
       drawer: false,
       size: 10,
       currentPage: 1,
@@ -128,6 +134,7 @@ export default {
     visible(row) {
       this.typeCode = row.typeCode
       this.dataType = row.dataType
+      this.name = row.name
       this.drawer = true
       this.getList()
     },
@@ -138,13 +145,13 @@ export default {
       this.dialogVisible = true
       this.deleteItem = row.code
       this.deleteName = row.name
-      this.deleteItemType = row.id
+      this.deleteItemType = row.typeCode
       this.deleteIndex = index
     },
     deleteDic() {
       this.loading = true
       del({
-        Id: this.deleteItemType,
+        TypeCode: this.deleteItemType,
         Code: this.deleteItem
       })
         .then(() => {

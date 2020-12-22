@@ -5,24 +5,25 @@
     :modal-append-to-body="false"
     width="700px"
   >
-    <el-form label-width="100px">
-      <el-form-item label="字典项类型">
+    <el-form ref="ruleForm" :model="modal" label-width="100px" :rules="rule">
+      <el-form-item label="字典类型">
         <el-input
-          v-model="dataType"
+          v-model="typeCode"
           disabled
-          placeholder="字典项类型"
+          placeholder="字典类型"
         />
       </el-form-item>
-      <el-form-item label="字典项编码">
+      <el-form-item label="字典编码" prop="code">
         <el-input
-          v-model="code"
-          placeholder="字典项编码"
+          v-model="modal.code"
+          :disabled="type !== 'new'"
+          placeholder="字典编码"
         />
       </el-form-item>
-      <el-form-item label="字典项名称">
+      <el-form-item label="字典名称">
         <el-input
           v-model="name"
-          placeholder="字典项名称"
+          placeholder="字典名称"
         />
       </el-form-item>
       <el-form-item label="排序">
@@ -46,17 +47,23 @@
 </template>
 <script>
 import { add, update } from '@/api/dataDict'
+import { addAppointment, updAppointment } from '@/api/system/appointment'
 export default {
   data() {
     return {
       id: '',
+      modal: {
+        code: ''
+      },
       code: '',
       typeCode: '',
       dataType: '',
       name: '',
       sort: 0,
       description: '',
-
+      rule: {
+        code: [{ required: true, message: '请填写字典编码', trigger: 'blur' }]
+      },
       loading: false,
       dialogVisible: false,
       type: ''
@@ -66,7 +73,7 @@ export default {
     edit(row) {
       this.dialogVisible = true
       this.type = 'edit'
-      this.code = row.code
+      this.modal.code = row.code
       this.id = row.id
       this.typeCode = row.typeCode
       this.dataType = row.dataType
@@ -77,7 +84,7 @@ export default {
     add(code, type) {
       this.dialogVisible = true
       this.type = 'new'
-      this.code = ''
+      this.modal.code = ''
       this.id = ''
       this.typeCode = code
       this.dataType = type
@@ -98,7 +105,7 @@ export default {
               'Id': this.id,
               'DataType': this.dataType,
               'TypeCode': this.typeCode,
-              'Code': this.code,
+              'Code': this.modal.code,
               'Text': this.name,
               'IsLeaf': 1,
               'Description': this.description,
@@ -111,21 +118,27 @@ export default {
                 this.loading = false
               })
           } else {
-            add({
-              'DataType': this.dataType,
-              'TypeCode': this.typeCode,
-              'Code': this.code,
-              'Text': this.name,
-              'IsLeaf': 1,
-              'Description': this.description,
-              'SortNum': this.sort
-            })
-              .then(() => {
-                this.success()
-              })
-              .catch(() => {
+            this.$refs.ruleForm.validate((valid) => {
+              if (valid) {
+                add({
+                  'DataType': this.dataType,
+                  'TypeCode': this.typeCode,
+                  'Code': this.modal.code,
+                  'Text': this.name,
+                  'IsLeaf': 1,
+                  'Description': this.description,
+                  'SortNum': this.sort
+                })
+                  .then(() => {
+                    this.success()
+                  })
+                  .catch(() => {
+                    this.loading = false
+                  })
+              } else {
                 this.loading = false
-              })
+              }
+            })
           }
         })
         .catch(() => {})

@@ -8,22 +8,23 @@
       <el-form-item label="类型编码">
         <el-input
           v-model="typeCode"
-          placeholder="字典项类型编码"
+          :disabled="type !== 'new'"
+          placeholder="类型编码"
         />
       </el-form-item>
-      <el-form-item label="字典项类型">
-        <el-input
-          v-model="dataType"
-          placeholder="字典项类型"
-        />
-      </el-form-item>
-      <el-form-item label="字典项编码">
-        <el-input
-          v-model="code"
-          placeholder="字典项编码"
-        />
-      </el-form-item>
-      <el-form-item label="字典项名称">
+      <!--      <el-form-item label="字典项类型">-->
+      <!--        <el-input-->
+      <!--          v-model="dataType"-->
+      <!--          placeholder="字典项类型"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item label="">-->
+      <!--        <el-input-->
+      <!--          v-model="code"-->
+      <!--          placeholder="字典项编码"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+      <el-form-item label="名称">
         <el-input
           v-model="name"
           placeholder="字典项名称"

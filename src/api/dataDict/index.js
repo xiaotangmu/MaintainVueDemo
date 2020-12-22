@@ -45,7 +45,14 @@ export function add(data) {
 }
 export function del(data) {
   return request({
-    url: url + '/DataDict/Delete',
+    url: url + '/DataDict/DeleteChild',
+    method: 'delete',
+    data
+  })
+}
+export function delParent(data) {
+  return request({
+    url: url + '/DataDict/DeleteParent',
     method: 'delete',
     data
   })

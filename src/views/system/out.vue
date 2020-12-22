@@ -25,8 +25,9 @@
       />
       <el-table-column align="left" width="180px" label="操作">
         <template slot-scope="scope">
-          <el-button @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
           <el-button
+            size="small"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)"
           >删除</el-button>
@@ -48,9 +49,9 @@
             <template v-if="col.model === 'TotalPrice'">
               {{ scope.row.TotalPrice | toMoney }}
             </template>
-            <template v-if="col.model === 'OutNo'">
+            <template v-else-if="col.model === 'OutNo'">
               <el-tag :type="scope.row.Status === 0 ? 'primary' :scope.row.Status === 1 ? 'warning': scope.row.Status === 2 ? 'success': 'danger'">
-                {{ scope.row.Status === 0 ? "未绑定" :scope.row.Status === 1 ? "未完成": scope.row.Status === 2 ? "已完成": "坏件" }}
+                {{ scope.row.Status === 0 ? "未绑定" :scope.row.Status === 1 ? "未完成": scope.row.Status === 2 ? "已完成": "寄厂维修" }}
               </el-tag>
               {{ scope.row.OutNo }}
             </template>

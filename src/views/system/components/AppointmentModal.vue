@@ -24,6 +24,7 @@
               type="datetime"
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
               style="width: 100%;"
             />
           </el-form-item>
@@ -43,12 +44,13 @@
             <el-input v-model="modal.Phone" />
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col v-if="this.type === '编辑'" :span="12">
           <el-form-item label="状态" prop="Status">
             <el-select v-model="modal.Status" style="width: 100%;">
-              <el-option :value="0" label="未处理" />
-              <el-option :value="1" label="已处理" />
+              <el-option :value="0" disabled label="未处理" />
+              <el-option :value="1" disabled -label="已处理" />
               <el-option :value="2" label="取消" />
+              <el-option :value="3" disabled label="维修中" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -82,19 +84,16 @@ export default {
         Type: '',
         Contact: '',
         Phone: '',
-        Status: '',
-        Remark: ''
+        Remark: '',
+        Status: '未处理',
+        SkuName: ''
       },
       loading: false,
       rule: {
-        CompanyName: [{ required: true, message: '请选择公司', trigger: 'blur' }],
         CarLicense: [{ required: true, message: '请输入车牌号', trigger: 'blur' }],
-        Description: [{ required: true, message: '请输入问题描述', trigger: 'blur' }],
         AppointmentDate: [{ required: true, message: '请选择预约时间', trigger: 'blur' }],
-        Type: [{ required: true, message: '请输入车型', trigger: 'blur' }],
         Contact: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
-        Phone: [{ required: true, message: '请输入联系电话', trigger: 'blur' }],
-        Status: [{ required: true, message: '请输入选择状态', trigger: 'blur' }]
+        Phone: [{ required: true, message: '请输入联系电话', trigger: 'blur' }]
       }
     }
   },

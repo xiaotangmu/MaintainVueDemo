@@ -30,6 +30,7 @@
 
           <template v-for="col in column">
             <el-table-column
+              v-if="col.model !== 'Description'"
               :key="col.model"
               :align="col.align || 'center'"
               :label="col.label"
@@ -50,6 +51,18 @@
               </template>
             </el-table-column>
           </template>
+          <el-table-column
+            label="描述"
+          >
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <p style="max-width: 350px">{{ scope.row.Description }}</p>
+                <div slot="reference" class="name-wrapper">
+                  <i class="el-icon-chat-line-square" />
+                </div>
+              </el-popover>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
           style="text-align: center;margin-top: 20px;"

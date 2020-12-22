@@ -17,9 +17,8 @@
     />
     <el-select v-model="search.Status" style="width: 150px;">
       <el-option :value="-1" :label="'全部'" />
-      <el-option :value="1" :label="'未处理'" />
-      <el-option :value="2" :label="'已处理'" />
-      <el-option :value="3" :label="'维修取消'" />
+      <el-option :value="1" :label="'已签字'" />
+      <el-option :value="0" :label="'未签字'" />
     </el-select>
     <el-button type="primary" icon="el-icon-plus" @click="getList()">查询</el-button>
     <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
@@ -198,6 +197,21 @@
             <template v-if="col.model === 'TotalPrice'">
               {{ scope.row.TotalPrice | toMoney }}
             </template>
+            <template v-else-if="col.model === 'Status'">
+              <el-tag
+                v-if="scope.row.Status === 1"
+                type="success"
+              >
+                已签字
+              </el-tag>
+              <el-tag
+                v-else
+                type="primary"
+                effect="plain"
+              >
+                维修中
+              </el-tag>
+            </template>
             <template v-else-if="col.model === 'StartDate'">
               {{ scope.row.StartDate | formatDate('yyyy-MM-dd hh:mm:ss') }}
             </template>
@@ -247,6 +261,7 @@ export default {
       },
       activeName: 'first',
       column: [
+        { label: '维修单编号', model: 'MaintainNo' },
         { label: '维修员工', model: 'Staff' },
         { label: '状态', model: 'Status' },
         { label: '创建时间', model: 'StartDate' },

@@ -30,7 +30,12 @@
         </el-select>
       </el-form-item>
       <el-form-item label="产品描述">
-        <el-input v-model="spu.Description" />
+        <el-input
+          v-model="spu.Description"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入内容"
+        />
       </el-form-item>
       <el-card class="box-card">
         <div slot="header" class="clearfix">

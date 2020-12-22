@@ -58,6 +58,7 @@
                   type="date"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   style="width: 100%;"
                   :picker-options="pickerOptions"
                 />
@@ -145,9 +146,12 @@
               <el-table-column
                 label="类型"
               >
-                <template slot-scope="scope">
+                <span v-if="modal.Type !== 1" slot-scope="scope">
                   {{ scope.row.Status === 0 ? "新" : scope.row.Status === 1 ? "旧" : "工具" }}
-                </template>
+                </span>
+                <span v-else slot-scope="scope">
+                  {{ scope.row.Status === 1 ? "旧配件" : "工具" }}
+                </span>
               </el-table-column>
             </el-table>
           </el-card>

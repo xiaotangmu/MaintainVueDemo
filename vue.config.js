@@ -11,7 +11,7 @@ const name = defaultSettings.title || '维修管理系统' // page title
 const port = process.env.port || process.env.npm_config_port || 9527 // dev port
 
 module.exports = {
-  publicPath: '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -25,7 +25,7 @@ module.exports = {
     },
     proxy: {
       '/dev-api/proxy': {
-        target: 'https://192.168.1.3:8089',
+        target: 'https://localhost:8789',
         changeOrigin: true,
         pathRewrite: {
           '^/dev-api/proxy': '/api/v0.1'

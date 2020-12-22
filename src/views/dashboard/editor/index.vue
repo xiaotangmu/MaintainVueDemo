@@ -11,15 +11,15 @@
         <span style="font-size:20px;padding-top:20px;display:inline-block;">Editor's Dashboard</span>
       </div>
     </div>
-    <div>
-      {{ msg }}
-      <el-button @click="getData">测试Auth</el-button><br>
-      {{ msg1 }}
-      <el-button @click="getData1">测试NeedRole</el-button><br>
-      {{ msg2 }}
-      <el-button @click="getData2">测试NoAuth</el-button><br>
-      <img :src="emptyGif" class="emptyGif">
-    </div>
+    <!--    <div>-->
+    <!--      {{ msg }}-->
+    <!--      <el-button @click="getData">测试Auth</el-button><br>-->
+    <!--      {{ msg1 }}-->
+    <!--      <el-button @click="getData1">测试NeedRole</el-button><br>-->
+    <!--      {{ msg2 }}-->
+    <!--      <el-button @click="getData2">测试NoAuth</el-button><br>-->
+    <!--      <img :src="emptyGif" class="emptyGif">-->
+    <!--    </div>-->
   </div>
 </template>
 

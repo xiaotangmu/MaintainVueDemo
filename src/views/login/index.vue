@@ -1,9 +1,9 @@
 <template>
-  <div class="login-container">
+  <div class="login-container" :style="'background-image: url(' + avatar + ')'">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">维修系统Login</h3>
       </div>
 
       <el-form-item prop="username">
@@ -75,10 +75,16 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { mapGetters } from 'vuex'
 /* import SocialSign from './components/SocialSignin' */
 
 export default {
   name: 'Login',
+  computed: {
+    ...mapGetters([
+      'avatar'
+    ])
+  },
   /*   components: { SocialSign }, */
   data() {
     const validateUsername = (rule, value, callback) => {
@@ -112,6 +118,7 @@ export default {
       otherQuery: {}
     }
   },
+
   watch: {
     $route: {
       handler: function(route) {
@@ -255,8 +262,17 @@ $light_gray:#eee;
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  // background-color: $bg;
   overflow: hidden;
+  /*-webkit-filter: blur(10px);*/
+  /*-moz-filter: blur(10px);*/
+  /*-o-filter: blur(10px);*/
+  /*-ms-filter: blur(10px);*/
+  /*filter: blur(10px);*/
+  opacity: 0.9;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  background-size: 100% 100%;
 
   .login-form {
     position: relative;

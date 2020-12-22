@@ -41,10 +41,11 @@
       </el-col>
       <el-col :span="12">
         <el-form-item label="类型" prop="Status">
-          <el-select v-model="modal.Status" style="width: 300px;">
+          <el-select v-if="type === '新增'" v-model="modal.Status" style="width: 300px;">
             <el-option :value="0" label="普通出库" />
             <el-option :value="3" label="坏件寄厂维修" />
           </el-select>
+          <label v-else>{{ modal.Status === 3 ? '坏件寄厂维修' : '普通出库' }}</label>
         </el-form-item>
       </el-col>
       <el-col :span="12">
@@ -88,7 +89,7 @@
                 @click="delItem(scope.row)"
               >删除</el-button>
               <el-button
-                v-if="status === 0"
+                v-if="(status === 0 || status === 1 ) && scope.row.IsBad !== 3 && scope.row.IsBad !== 2"
                 type="primary"
                 @click="updItem(scope.row)"
               >更新</el-button>
@@ -102,6 +103,10 @@
           <el-table-column
             prop="SkuNo"
             label="库存编号"
+          />
+          <el-table-column
+            prop="SkuName"
+            label="名称"
           />
           <el-table-column
             label="单价"
@@ -304,6 +309,9 @@
             placeholder="请输入内容"
           />
         </el-form-item>
+        <el-form-item>
+          <i class="el-icon-info" /> 若该库存绑定了维修单，修改为坏件后，不再显示于维修单库存列表中。
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="updVisible = false">取 消</el-button>
@@ -345,7 +353,8 @@ export default {
         Status: '',
         IsBad: 0,
         Remark: '',
-        SkuNo: ''
+        SkuNo: '',
+        SkuName: ''
       },
       valueVisible: false,
       dialogVisible: false,
@@ -430,12 +439,14 @@ export default {
         this.addrList = []
         this.value.Tool = ''
         this.value.Unit = ''
+        this.value.SkuName = ''
         return
       }
       this.value.Price = this.spuList[index].Price
       this.addrList = this.spuList[index].addressList
       this.value.Tool = this.spuList[index].Tool
       this.value.Unit = this.spuList[index].Unit
+      this.value.SkuName = this.spuList[index].SkuName
     },
     'value.AddressId'(val) {
       if (val === '') {
@@ -593,7 +604,8 @@ export default {
         Status: '',
         IsBad: 0,
         Remark: '',
-        SkuNo: ''
+        SkuNo: '',
+        SkuName: ''
       }
     },
     handleDelete(index) {
@@ -654,6 +666,7 @@ export default {
           Id: i.Id,
           AddressId: i.AddressId,
           SkuId: i.SkuId,
+          SkuName: i.SkuName,
           Price: i.Price,
           Tool: i.Tool,
           Unit: i.Unit,

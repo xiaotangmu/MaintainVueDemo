@@ -1,6 +1,13 @@
 import request from '@/utils/request'
 import { url } from '../proxy'
 
+export function udpateSkuToBad(data) {
+  return request({
+    url: url + '/Maintain/UpdateSkuList',
+    method: 'post',
+    data
+  })
+}
 export function getMaintainList(params) {
   return request({
     url: url + '/Maintain/GetListPageBySearch',

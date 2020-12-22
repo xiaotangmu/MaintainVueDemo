@@ -121,14 +121,16 @@ const users = {
   'admin-token': {
     routes: routes,
     introduction: 'I am a super administrator',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    // avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    avatar: 'img/taxi.jpg',
     name: 'Super Admin',
     role: ['admin']
   },
   'editor-token': {
     routes: [],
     introduction: 'I am an editor',
-    avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    // avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+    avatar: 'img/taxi.jpg',
     name: 'Normal Editor',
     role: ['editor']
   }

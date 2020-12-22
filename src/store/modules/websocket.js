@@ -110,7 +110,8 @@ const actions = {
     console.log('socket开始连接')
     commit('SET_WS', new signalR.HubConnectionBuilder()
       // .withUrl("https://localhost:8789/api/chatHub?username=xxx", { // 带参, 注意路径不能在普通路径下（api/v0.1/）
-      .withUrl('https://192.168.1.3:8089/api/chatHub?LoginName=' + username, {
+      .withUrl('https://test.grandpowertech.com:8789/api/chatHub?LoginName=' + username, {
+      // .withUrl('https://localhost:8789/api/chatHub?LoginName=' + username, {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
       })

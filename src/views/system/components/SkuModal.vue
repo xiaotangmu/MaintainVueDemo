@@ -47,11 +47,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="库存描述">
-            <el-input v-model="modal.Description" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item label="警报值">
             <el-input-number v-model="modal.Alarm" :step="1" />
           </el-form-item>
@@ -82,6 +77,16 @@
         <el-col :span="12">
           <el-form-item label="总数">
             <el-input-number v-model="modal.TotalCount" disabled :step="1" />
+          </el-form-item>
+        </el-col>
+        <el-col>
+          <el-form-item label="库存描述">
+            <el-input
+              v-model="modal.Description"
+              type="textarea"
+              :rows="3"
+              placeholder="请输入内容"
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -204,8 +209,8 @@ export default {
         Room: '',
         Self: '',
         SkuNo: '',
-        Status: null,
-        Status2: null
+        Status: '0',
+        Status2: '0'
       },
       valueVisible: false,
       dialogVisible: false,
@@ -218,7 +223,7 @@ export default {
         Brand: '',
         Price: '',
         Unit: '',
-        Tool: '',
+        Tool: 0,
         TotalCount: 20,
         AttrList: [],
         addressList: []

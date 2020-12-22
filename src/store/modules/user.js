@@ -4,7 +4,7 @@ import { getToken, setToken, removeToken, getUsername, setUsername, removeUserna
 const state = {
   token: getToken(),
   name: '',
-  avatar: '',
+  avatar: 'img/taxi2.png',
   introduction: '',
   routes: null,
   role: '',

@@ -12,6 +12,19 @@
     />
     <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
     <el-table :data="tableData" stripe style="width: 100%">
+      <el-table-column align="center" width="280" label="操作">
+        <template slot-scope="scope">
+          <el-button
+            size="small"
+            type="primary"
+            @click="handleEdit(scope.row)"
+          >编辑</el-button>
+          <el-button type="danger" size="small" @click="handleDel(scope.row)">删除</el-button>
+          <el-button type="success" size="small" @click="dicItem(scope.row)">
+            子项
+          </el-button>
+        </template>
+      </el-table-column>
       <template v-for="col in column">
         <el-table-column
           :key="col.model"
@@ -28,18 +41,6 @@
         </el-table-column>
       </template>
 
-      <el-table-column align="center" width="280" label="操作">
-        <template slot-scope="scope">
-          <el-button
-            type="primary"
-            @click="handleEdit(scope.row)"
-          >编辑</el-button>
-          <el-button type="danger" @click="handleDel(scope.row)">删除</el-button>
-          <el-button type="success" @click="dicItem(scope.row)">
-            子项
-          </el-button>
-        </template>
-      </el-table-column>
     </el-table>
     <el-pagination
       style="text-align: center;margin-top: 20px;"
@@ -75,7 +76,7 @@
 <script>
 import DicItem from './modules/DictionaryItem'
 import DicModal from './modules/DictionaryModal'
-import { getPageList, del } from '@/api/dataDict'
+import { getPageList, delParent } from '@/api/dataDict'
 import { delEmpty } from '@/utils/utils'
 export default {
   components: {
@@ -86,8 +87,8 @@ export default {
     return {
       column: [
         { model: 'typeCode', label: '类型编码' },
-        { model: 'code', label: '字典项编码' },
-        { model: 'name', label: '字典项名称' },
+        // { model: 'code', label: '字典项编码' },
+        { model: 'name', label: '名称' },
         { model: 'sort', label: '排序' },
         { model: 'description', label: '描述' }
       ],
@@ -142,7 +143,7 @@ export default {
       this.dialogVisible = true
       this.deleteItem = row.code
       this.deleteName = row.name
-      this.deleteItemType = row.id
+      this.deleteItemType = row.typeCode
     },
     handleNew() {
       this.$refs.dicModal.add()
@@ -151,9 +152,8 @@ export default {
       this.$refs.dicItem.visible(row)
     },
     deleteDic() {
-      del({
-        Id: this.deleteItemType,
-        Code: this.deleteItem
+      delParent({
+        TypeCode: this.deleteItemType
       }).then(() => {
         this.$message({
           message: '删除成功',

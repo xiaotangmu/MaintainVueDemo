@@ -16,7 +16,8 @@
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <el-badge is-dot :hidden="ws_badge.user.warning === 0">
-            <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+            <!--            <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">-->
+            <img :src="avatar" class="user-avatar">
           </el-badge>
           <i class="el-icon-caret-bottom" />
         </div>

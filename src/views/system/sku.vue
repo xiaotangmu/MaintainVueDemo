@@ -18,11 +18,12 @@
         </el-input>
         <el-button type="primary" icon="el-icon-plus" @click="handleNew()">新增</el-button>
         <el-table :data="tableData" style="width: 100%" stripe>
-          <el-table-column align="left" width="180px" label="操作">
+          <el-table-column align="left" width="150px" label="操作">
             <template slot-scope="scope">
-              <el-button @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button
                 type="danger"
+                size="small"
                 @click="handleDelete(scope.$index, scope.row)"
               >删除</el-button>
             </template>
@@ -63,6 +64,7 @@
 
           <template v-for="col in column">
             <el-table-column
+              v-if="col.model !== 'Description'"
               :key="col.model"
               :align="col.align || 'center'"
               :label="col.label"
@@ -95,6 +97,18 @@
               </template>
             </el-table-column>
           </template>
+          <el-table-column
+            label="库存描述"
+          >
+            <template slot-scope="scope">
+              <el-popover trigger="hover" placement="top">
+                <p style="max-width: 350px">{{ scope.row.Description }}</p>
+                <div slot="reference" class="name-wrapper">
+                  <i class="el-icon-chat-line-square" />
+                </div>
+              </el-popover>
+            </template>
+          </el-table-column>
         </el-table>
         <el-pagination
           style="text-align: center;margin-top: 20px;"

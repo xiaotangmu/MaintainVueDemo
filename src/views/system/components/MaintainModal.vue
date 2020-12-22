@@ -27,6 +27,7 @@
                   type="datetime"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   style="width: 100%;"
                   :picker-options="pickerOptions"
                 />
@@ -39,6 +40,7 @@
                   type="datetime"
                   placeholder="选择日期时间"
                   format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   style="width: 100%;"
                 />
               </el-form-item>
@@ -64,32 +66,38 @@
             </div>
             <el-col :span="12">
               <el-form-item label="车牌号">
-                <el-input v-model="modal.AppointmentModel.CarLicense" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.CarLicense }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.CarLicense" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="车型">
-                <el-input v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.Type }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.Type" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="公司">
-                <el-input v-model="modal.AppointmentModel.CompanyName" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.CompanyName }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.CompanyName" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="联系人">
-                <el-input v-model="modal.AppointmentModel.Contact" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.Contact }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.Contact" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="联系电话">
-                <el-input v-model="modal.AppointmentModel.Phone" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.Phone }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.Phone" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label="问题描述">
-                <el-input v-model="modal.AppointmentModel.Description" type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :disabled="modal.IsAppointment === 0" />
+                <span v-if="modal.IsAppointment === 0">{{ modal.AppointmentModel.Description }}</span>
+                <el-input v-else v-model="modal.AppointmentModel.Description" type="textarea" :autosize="{ minRows: 3, maxRows: 6 }" :disabled="modal.IsAppointment === 0" />
               </el-form-item>
             </el-col>
           </el-card>
@@ -149,11 +157,36 @@
         </el-collapse-item>
         <el-collapse-item v-if="disable" title="库存列表" name="4">
           <el-tabs v-model="activeName">
+            <el-dialog title="'标记坏件" :visible.sync="dialogMarkSkuVisible" :modal-append-to-body="!dialogMarkSkuVisible">
+              <el-form :model="markSku">
+                <el-form-item label="编号" label-width="120px">
+                  <span>{{ markSku.skuNo }}</span>
+                </el-form-item>
+                <el-form-item label="名称" label-width="120px">
+                  <span>{{ markSku.productName }}</span>
+                </el-form-item>
+                <el-form-item label="备注" label-width="120px">
+                  <el-input v-model="markSku.remark" type="textarea" :row="2" autocomplete="off" />
+                </el-form-item>
+                <el-form-item label="" label-width="120px">
+                  <span><i class="el-icon-info" /> 该库存标记为坏件，刷新后，不再出现在维修单中，可以到相应出库单中查看。</span>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogMarkSkuVisible = false">取 消</el-button>
+                <el-button type="danger" @click="changeToBeBad">标 记</el-button>
+              </div>
+            </el-dialog>
             <el-tab-pane label="零件列表" name="part-tab">
               <el-table
                 :data="modal.SkuList"
                 style="width: 100%"
               >
+                <el-table-column v-if="modal.Status === 0" align="left" label="操作">
+                  <template slot-scope="scope">
+                    <el-button size="small" type="danger" plain @click="goChangeToBeBad(scope.$index, scope.row)">标记坏件</el-button>
+                  </template>
+                </el-table-column>
                 <el-table-column
                   prop="SkuNo"
                   label="库存编码"
@@ -256,7 +289,8 @@
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancel">取 消</el-button>
       <el-button v-show="!disable" type="primary" :loading="loading" @click="submit">确 定</el-button>
-      <el-button v-if="disable" type="primary" :loading="loading" @click="confirmName">确认签名</el-button>
+      <el-button v-if="disable && modal.Status === 0" type="primary" :loading="loading" @click="confirmName">确认签名</el-button>
+      <span v-if="modal.Status === 1" style="margin-left: 10px">已签名</span>
     </span>
 
     <el-dialog
@@ -322,14 +356,22 @@
 </template>
 <script>
 import { getOutAllNoBind } from '@/api/system/out'
-import { addMaintain, updInfo, addOut, delOut, confirm } from '@/api/system/maintain'
-import { getAppointmentAll } from '@/api/system/appointment'
+import { addMaintain, updInfo, addOut, delOut, confirm, udpateSkuToBad } from '@/api/system/maintain'
+import { getAppointmentList } from '@/api/system/appointment'
 import { getList, getListBy1 } from '@/api/category/catalog'
 import { getSkuList } from '@/api/system/sku'
 import { getChildrenByType, updDict } from '@/api/dataDict'
 export default {
   data() {
     return {
+      markSku: {
+        skuNo: '',
+        productName: '',
+        outSkuId: '',
+        remark: '',
+        isBad: 1
+      },
+      dialogMarkSkuVisible: false,
       dictId: '',
       dictList: [],
       activeNames: [],
@@ -380,7 +422,8 @@ export default {
         },
         StartDate: '',
         ReturnDate: '',
-        Operator: ''
+        Operator: '',
+        Status: ''
       },
       loading: false,
       valueRule: {
@@ -453,8 +496,9 @@ export default {
   },
   created() {
     this.getOutList()
-    getAppointmentAll().then(res => {
-      this.appointmentList = res.data
+    getAppointmentList({ PageIndex: 1, PageSize: 200, Status: 0 }).then(res => {
+      console.log(res.data)
+      this.appointmentList = res.data.Items
     })
     getList().then(res => {
       this.options = res.data
@@ -464,14 +508,53 @@ export default {
     })
   },
   methods: {
+    // 更新sku 为坏件
+    changeToBeBad() {
+      this.$confirm('确认标记编号 ' + this.markSku.skuNo + ' 库存为坏件?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        udpateSkuToBad({
+          SkuList: [
+            {
+              OutSkuId: this.markSku.outSkuId,
+              Remark: this.markSku.remark,
+              IsBad: '1'
+            }
+          ],
+          MaintainId: this.modal.MaintainId,
+          MaintainNo: this.modal.MaintainNo
+        }).then(() => {
+          this.success()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
+      this.dialogMarkSkuVisible = false
+    },
+    goChangeToBeBad(index, data) {
+      this.markSku = {
+        skuNo: data.SkuNo,
+        productName: data.ProductName,
+        outSkuId: data.OutSkuId,
+        remark: data.Remark,
+        isBad: 1
+      }
+      this.dialogMarkSkuVisible = true
+    },
     confirmName() {
-      console.log(this.modal)
       this.$confirm('确认签名？').then(() => {
         confirm({
           MaintainId: this.modal.MaintainId,
           MaintainNo: this.modal.MaintainNo
         }).then(() => {
           this.success()
+        }).catch((res) => {
+          this.$message.error(res)
         })
       })
     },
